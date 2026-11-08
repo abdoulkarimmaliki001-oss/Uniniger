@@ -1,0 +1,604 @@
+<title>UniNiger</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+/* Concept: application mobile-first. Bandeau marine, accent or, cartes blanches ; une seule colonne centrée sur grand écran. */
+:root{
+  --bg:#EEF1F5; --card:#FFFFFF; --ink:#0F1B2D; --mut:#5B6778; --line:#D9DFE8;
+  --head:#042C53; --gold:#C99A2E; --gold-ink:#3A2A05; --primary:#0B4A85; --primary-ink:#FFFFFF;
+  --crit-bg:#FCEBEB; --crit:#A32D2D; --imp-bg:#FAEEDA; --imp:#8A5410;
+  --info-bg:#E6F1FB; --info:#1C5C9C; --ok-bg:#E1F5EE; --ok:#0F6E56;
+  --font:'Public Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0B1522; --card:#13223A; --ink:#E8EEF7; --mut:#9AA9BD; --line:#233552;
+  --head:#031F3B; --gold:#E0B04A; --gold-ink:#2A1E02; --primary:#4F8FD6; --primary-ink:#06182B;
+  --crit-bg:#3A1A1A; --crit:#F09A9A; --imp-bg:#3A2A10; --imp:#E9B766;
+  --info-bg:#12304F; --info:#8FBDEB; --ok-bg:#0F3328; --ok:#6FD3B1; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B1522; --card:#13223A; --ink:#E8EEF7; --mut:#9AA9BD; --line:#233552;
+  --head:#031F3B; --gold:#E0B04A; --gold-ink:#2A1E02; --primary:#4F8FD6; --primary-ink:#06182B;
+  --crit-bg:#3A1A1A; --crit:#F09A9A; --imp-bg:#3A2A10; --imp:#E9B766;
+  --info-bg:#12304F; --info:#8FBDEB; --ok-bg:#0F3328; --ok:#6FD3B1; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--font);margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3,h4{margin:0;text-wrap:balance;line-height:1.2}
+p{margin:0}
+.wrap{max-width:640px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));padding-block:0}
+.bar{background:var(--head);color:#fff}
+.bar .wrap{display:flex;align-items:center;gap:12px;padding-block:14px}
+.logo{font-weight:800;font-size:20px;letter-spacing:-.01em}
+.logo b{color:var(--gold)}
+.sp{flex:1}
+.sub{font-size:12px;opacity:.8}
+.ib{background:none;border:0;color:inherit;width:40px;height:40px;display:grid;place-items:center;border-radius:10px;cursor:pointer;position:relative}
+.ib:hover{background:rgba(255,255,255,.12)}
+.dot{position:absolute;top:6px;right:6px;min-width:17px;height:17px;border-radius:9px;background:var(--gold);color:var(--gold-ink);font-size:11px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+svg.s{width:16px;height:16px}
+main{padding-block:16px 96px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.card h3{font-size:16px;margin-bottom:6px}
+.muted{color:var(--mut)} .small{font-size:13px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border-radius:12px;border:1px solid var(--primary);background:var(--primary);color:var(--primary-ink);font-weight:700;cursor:pointer;text-align:center}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
+.btn.ghost{background:transparent;color:var(--primary)}
+.btn.red{background:var(--crit);border-color:var(--crit);color:#fff}
+.btn.sm{min-height:36px;padding:0 12px;font-size:13px;border-radius:10px}
+.btn.full{width:100%}
+.btn:focus-visible,.ib:focus-visible,.tab:focus-visible,.lk:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.est:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.lk{background:none;border:0;color:var(--primary);font-weight:600;cursor:pointer;padding:6px 0;text-decoration:underline}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.stack{display:flex;flex-direction:column;gap:10px}
+.hero{background:var(--head);color:#fff;border-radius:16px;padding:20px 18px;display:flex;flex-direction:column;gap:10px}
+.hero h1{font-size:24px;letter-spacing:-.01em}
+.hero p{opacity:.88}
+.hero .gl{color:var(--gold)}
+.sec{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.est{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;min-width:0}
+.est.off{opacity:.62;cursor:default}
+.est.on{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold) inset}
+.est b{font-size:15px}.est span.n{font-size:12px;color:var(--mut);overflow-wrap:anywhere}
+.lgo{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:#fff;flex:none}
+.lgo.sm{width:34px;height:34px;border-width:1px}
+.mk{width:52px;height:52px;border-radius:50%;background:var(--head);color:var(--gold);display:grid;place-items:center;font-weight:800;font-size:15px;border:2px solid var(--gold)}
+.pill{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--info-bg);color:var(--info)}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+label{display:block;font-weight:600;font-size:13px;margin-bottom:4px}
+input,select,textarea{width:100%;min-height:46px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+textarea{min-height:84px;resize:vertical}
+.chk{display:flex;gap:10px;align-items:flex-start;font-weight:400}
+.chk input{width:20px;min-height:20px;margin-top:2px;flex:none}
+.demo{background:var(--imp-bg);color:var(--imp);border-radius:10px;padding:10px 12px;font-size:13px}
+.ann{border:1px solid var(--line);border-left-width:5px;border-radius:12px;padding:12px;background:var(--card);display:flex;flex-direction:column;gap:6px}
+.ann.l3{border-left-color:var(--crit);background:var(--crit-bg)}
+.ann.l2{border-left-color:var(--imp)}
+.ann.l1{border-left-color:var(--info)}
+.ann-h{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.ann h4{font-size:15px}
+.meta{font-size:12px;color:var(--mut)}
+.chip{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px}
+.c3{background:var(--crit);color:#fff}.c2{background:var(--imp-bg);color:var(--imp)}.c1{background:var(--info-bg);color:var(--info)}
+.cn{background:var(--ok-bg);color:var(--ok)}.cp{background:var(--line);color:var(--mut)}
+.pinx{font-size:11px;font-weight:700;color:var(--crit)}
+.badge{background:var(--gold);color:var(--gold-ink);font-size:11px;font-weight:700;padding:1px 7px;border-radius:99px}
+.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:20}
+.tabs .wrap{display:flex;gap:2px;padding-block:6px}
+.tab{flex:1;min-width:0;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--mut);padding:6px 2px;border-radius:10px;cursor:pointer}
+.tab.on{color:var(--primary);background:var(--info-bg)}
+.stops{display:flex;flex-direction:column}
+.stop{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.stop:last-child{border:0}
+.pt{width:14px;height:14px;border-radius:50%;border:3px solid var(--line);background:var(--card);flex:none}
+.pt.pass{background:var(--ok);border-color:var(--ok)}
+.pt.here{background:var(--gold);border-color:var(--gold-ink);box-shadow:0 0 0 4px rgba(201,154,46,.3)}
+.st{flex:1;min-width:0}
+.st b{display:block;overflow-wrap:anywhere}
+.eta{font-weight:800;font-variant-numeric:tabular-nums;font-size:14px;white-space:nowrap}
+.bell{background:none;border:1px solid var(--line);border-radius:10px;width:40px;height:40px;display:grid;place-items:center;cursor:pointer;color:var(--mut)}
+.bell.on{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
+.seg{display:flex;gap:6px}
+.seg button{flex:1;min-height:38px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-weight:600;cursor:pointer}
+.seg button.on{background:var(--head);color:#fff;border-color:var(--head)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal button,.cal div{min-height:42px;border:1px solid var(--line);border-radius:8px;background:var(--card);font-variant-numeric:tabular-nums;position:relative}
+.cal div.h{border:0;background:none;min-height:auto;font-size:11px;color:var(--mut);font-weight:700}
+.cal button.today{border-color:var(--gold);border-width:2px}
+.cal button.sel{background:var(--head);color:#fff}
+.cal button i{position:absolute;bottom:4px;left:50%;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--gold)}
+.ev{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.ev:last-child{border:0}
+.ev .t{font-weight:800;font-variant-numeric:tabular-nums;min-width:52px}
+.who{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--line)}
+.who:last-child{border:0}
+.who>div:first-child{min-width:0;flex:1 1 180px}
+.ovl{position:fixed;inset:0;background:rgba(3,15,30,.6);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.mod{background:var(--card);width:100%;max-width:640px;max-height:90%;overflow:auto;border-radius:18px 18px 0 0;padding:18px max(16px,env(safe-area-inset-left,0px)) calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
+@media(min-width:700px){.ovl{align-items:center}.mod{border-radius:18px}}
+.mod h3{font-size:18px}
+.num{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.num b{font-variant-numeric:tabular-nums}
+.stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.stat div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+.stat b{font-size:24px;display:block;font-variant-numeric:tabular-nums}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--head);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:80;max-width:calc(100% - 32px);display:none;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+#toast.show{display:block}
+.off-b{background:var(--imp-bg);color:var(--imp);padding:8px 12px;border-radius:10px;font-size:13px;font-weight:600}
+.flag{width:28px;height:19px;border-radius:3px;border:1px solid var(--line);vertical-align:middle}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<div id="root"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+'use strict';
+var KEY='uniniger-demo-v2';
+var $=function(s){return document.querySelector(s)};
+var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+var hash=function(s){var h=5381;for(var i=0;i<s.length;i++){h=((h<<5)+h+s.charCodeAt(i))|0}return String(h>>>0)};
+var now=function(){return Date.now()};
+var uid=function(){return Math.random().toString(36).slice(2,9)};
+var DAYS=['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'];
+var MONTHS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+function dstr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function addDays(n){var d=new Date();d.setDate(d.getDate()+n);return dstr(d)}
+function pd(s){var p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2])}
+function fdate(s){var D=pd(s);return DAYS[D.getDay()]+' '+D.getDate()+' '+MONTHS[D.getMonth()]}
+function hhmm(t){var d=new Date(t);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}
+
+/* ---------- données ---------- */
+var ETAB=[
+ {id:'UAZ',name:'UniAgadez',full:"Université Jibril Oumar d'Agadez (UJO)",logo:true,city:'Agadez',type:'univ',on:true},
+ {id:'UAM',name:'UniNiamey',full:'Université Abdou Moumouni',city:'Niamey',type:'univ'},
+ {id:'UZR',name:'UniZinder',full:'Université de Zinder',city:'Zinder',type:'univ'},
+ {id:'UDM',name:'UniMaradi',full:'Université Dan Dicko Dankoulodo',city:'Maradi',type:'univ'},
+ {id:'UTH',name:'UniTahoua',full:'Université de Tahoua',city:'Tahoua',type:'univ'},
+ {id:'UDF',name:'UniDiffa',full:'Université de Diffa',city:'Diffa',type:'univ'},
+ {id:'UDS',name:'UniDosso',full:'Université de Dosso',city:'Dosso',type:'univ'},
+ {id:'UIN',name:'UniSay',full:'Université Islamique du Niger',city:'Say',type:'univ'},
+ {id:'EMG',name:'UniMines',full:"École des Mines, de l'Industrie et de la Géologie",city:'Niamey',type:'inst'}
+];
+var LOGO='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEBAYFBQUGBgYHCQ4JCQgICRINDQoOFRIWFhUSFBQXGiEcFxgfGRQUHScdHyIjJSUlFhwpLCgkKyEkJST/2wBDAQYGBgkICREJCREkGBQYJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCT/wAARCACwALADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD6oooooAKKKKACiis/Wte03w9ZG81O7itoQcAseXPooHLH2ANJtJXY0r6GhVe91Gz02Bri9uoLWFesk0gRR+JrzPxH8TNXl0y51GyiGg6Pbpvl1G9jMk23PVYhkD8cnnoK4LwT4l0Xx/quqXb2GrapFpke6TUdTlXc0nJ2LDnKZAJH0xgV5OIzenCMpUlzW3a2+86oYST+LQ9bvfi54dikMWnrfavIOMWVuSmf99sL+RNZd78TPEDANaeG7W0jPR9QvQp/JR/WvFPC58T/ABM8L6x4qs/Ft9otzbzSpY6bYbY4IgihgH4yxIOMn6+1cr4p10+NvBPhDxtrFrHJfWeq/wBm38xGEniUh1JXoM85x3zXJLG4mpPkUkrOzsrtO11vY3VCnFXtc+gF+JPiW7u0tBrPhC3uZH8tLeOTzJGb0AMmSfbFV2+JurwTvby+M/CCzxsUeJyilWBwQR5nBrgBpXh61/aB0k6HZaY8MmmTTuLRUZY5cuRLxnDdOevIriGtYtT+Knid7C08N3WnnUrdZ/tgiO2EuPMaIN8vZtxHPpzXNCviKkv4rS5VLZLd2saOnTS+Fbn0fYeO/Fs8C3EEWgarbkkCW2dgGx1wyswrRi+J9xa4/tbw1fQDvJbusq/XB2muN+GkHh6y8HwJ4SmuJtJknneJ5wdxYvhhyBwCMDivNNLtvEHiv4jeOJPD/irUtHttOf8Ad4kMsMlx0IZGyNpKv0HHFY4fMsU5zTnpH+Zedtbaoc8PSsny79j6d0jxvoGtusdrqMSzn/lhNmKTPptbGfwzW7nnFfKelfEyDWfhTd+KNb0W3u73TbtbS5ELiFZslcOuQRuw3Qdx2Fdb4O+JkyW9i+k6rLELxS0Gj62dskir1MZJzt54KnB9OK9ajm043WIhaztdar/M5p4RfYf3nv8ARXL+G/H+na7KtlOr6fqPQ205++f9hujfTg+1dRnNevSqwqx5oO6OOUXF2kgooorQkKKKKACiiigApCcCgnAzXnfxC+IMenQ3lnZX8djFaITqGpsfltF/uJ6ynp7Z9emNevCjDnmXTpubsjU8WeP4tIkl07S1iu9SjUtKXfbBZr/elbt67evrivI/F9xrup+HpvEnhLU9M8T6ool8+9aUSC0VVztgjHy7uvB9jznNcb4/XUL/AMMaT4p0uEaj4F3R3F3pgZori45IdrhgTkbh2PGQSOprN+Hup634Z8S6KPDlxo81n4qu/tVxollmVrKAHGWc8rtUt+K85r57EVauJj7S6svs9NN1Lzt8j0adONPRff8A5Honhf4m21r8GrbxNdSX+svZKIL4MytMJS+G3E4G0bgR324rmIbjWNN+Lmp6t4B0WbW7HV7KKW6DZgtvMcB1k80/KR/Fx3ZhW5pnwS0DSNR1LU/E18t3bXN491FpcJaK0X5jtLJnLsAenQe9b2o/EOCwgWz0OyRIol2RgKFRAOgUDgD6Vy4LBzxVWcMvpOo5Xv0ik7b+nfQMRiYUIqVeSj+ZyPiz4OeItNuJW+Hl7eadDrTMNRtWulS2gG3PBxuwSSowDj6Guh8EeDU0PwjdaD41Ph9dNcqINMhbzEiA5Z3kblnZuc9scY6VzGreJ9f1YkT6hLGh/ghO0f41zs2ntKxaRmkPqxJP619phuBcdWpKGLrRj6K7087rXp19TxKvENGMv3UW/XT/ADPWvDy/DDwSZf7Hl0nT3lGJJI33Ow64LEk49qrNpnwV1Fj5sHhksSSS0Kocnqc8V5K+m4/hqCTT+eldv/EO6SfM8RO766GH+sU3pyI+jdE0fwsNFGjeHNT0+C02uscVnOAY92SSpySDk5z61w7/ALPGq6Pb31p4d8a6tp9jqJzeRtEkzS8YJ3/K2cEj8a8j/s7a25V2sOhHBrodD8a+K/DbL/Z+s3QjX/llM3mxn8Gz+lcFbgDE0U3hK6d+klv+f5G0M/i9Kkf6/Av/ABO8AQ+DvC3hnRLW3vpfDFtqP2jWZY03zOTtHmMB2xuHoOKuxWOmfGzx0l0bSSbwboVr5MDFGiW6mbsp4baoA+m0etdf4d+Otte7bbxTpgiJ+X7XaglfxTqPwJ+legw29nqlkl7ot1Dd2bDKmEgge2B/KvkMywmYZcrYmm1LW0r6a7vTr89F0PYw2MoYj4H8jD1LSbHUoVjkiCMoARl6rjpUfgz4pRwF7W71KLV9NhlNub+Ft727A42yDqR79e/zDmuS+JvxI/4RCVND0+yubjxBfKi2CGLELO7bRlzwSDzj3GcV4z4Y1LU/Blx4ktbGeHUvEl7qkGnxQCLzPtTKzNMcZGBkgbvc4x258ppYilB1ou21k9mr638vM6sRyT92SPuqGaO4iSWGRJI3UMrochgehB7in1414I8U6p4Vs7KTVrCez0+7QPNYyOHksHJwSuOq55I989cg+xQzR3MKTQuskbqGV1OQwPQg+lfV4PGQxMOaO63R5dai6bsx9FFFdZiFFFZ2v6xDoOlT384LCMYSMdZHPCqPcnApSkopyeyGk27IwvG/iSa0A0fTJljv50LyTk4FnD3kJ7Hg4+hPavnbxV4nfTtXt79IdM8RfDyxkEF1BYzrcFpDg+fcKR94NyueODzzzu/GHS/HN7pH2XTtInv4r8fbdZuIJQrzIGGLZB94DHoDkAdcHPJ/CvWvBa+ONUvba3TRdP1GKDR4dElLTSTzPguzJz8gKkZPGT2zXy9XEfWebE/FFXsl06X0d1J9NNLHpwp+zXJ/X/DG14Tl0iy+IkOheCNVXUfDXiGznub2wj+dNOJUgOufu5OBtPrg54rsNA8OeHfhRprWGh2/n6jMP393IAZZf94joP8AZHFWb9fDXwysJ49D0qzsLi6Pzi3jwzHt7n2HSuT0nxTaXk5iuS0FzIx3yTcYOTxz9OnWllOCjmlflnJxpaXvvK34X/4fczxteWHp80FeXTy8y7qU95qUrSXUhb0XsKzZLQ4+7XVw29tdwxvFLG+9cgBhk+tQT2CBS45A4+pr9mwCw2EpKjh4qMV2/rU+CxPta03Oq7s5J7SoHt8dq6qTTcjlcGqsumAZyK9JV0zn9kzmXgHcVE9sD2ron0z0Az1qJtNI/hq/aoXIznWtQOgqM2ntXRHTj/dpP7O5+7R7RFqEjmzY5/hrV8Oa1q/hW9F3pVy8LEjzIzzHKPRl7/XrWiune1SLpYPO2sK8aVaDp1Ypxe6ZtBTi+aLsz07SdT0D4nWsH2ywtl1SykW4W3nUNtkXpJGT1+vUd6800fwd4b+CmtXeueKtXWTUNTupo7O5lhbEKHLtnGcOeQT9AOpqzY2s1hcxXNtI0M0bbkdDgg16LeWGlfFfwrc6RrNujTlAJFHBBH3ZEPYg/l06GvyXiPh3+z262Gb9hL4kt1/wP+Gfc+syzMnUtTq/EtmeH2TeLfib4xfxr4Ws4NO0yzjFlG1+7Kuox7/mVhyOhJ46YHJavc/BeuSeF9UXQL6XOn3Lf6HIx4ikJ+5/usenofrx5f4tfxD4c/4Rf4Z+FNQaC8uLdw+qXQAaKGPOSMDAOM9BnAA6nNYNxLf+C9b0LTtR8aS+KNH1/egZwXkhkGAskZUsdpYgcH19M18/QrTjUjUpNJJO0dbuK7v5O1z2ZwjKLjL/AIZn13RXK/D/AMSS63pb2t83/EysG8m4z1cfwv8AiBz7g11VfWUqsasFOOzPJnFxbiw6CvJfjB44g8PWt7qsxV7fREHkxE8XF84wi/RQcn/gVen6rfppenXN7IMrBG0hHrgcD8TgV87/ABB+JQ8Nv/YcPhNfE11Zxrq+rySjKWhc7g33T8wznJ6ZHvXl5tVk1GhBX5t9baLz89jowsdXJnJfDnxu2lrqFtaa3qWvapeaadQaa4cvp1pcEM7+Zj5owMbSTwT9RXVeBk03WIR8WNR0cWGr3UBghi3gxHHymdBgEFuRlsnAPPNcJ4j07wD8QPEmi6d4K32eqas2b42e5IoYdu6RZE4XdjPK8ZXkHNdb8XfEEWk6bb6BpGII40W1t40OCigY4+ijr614mIgqk4wpxcZT3vo0tn8n+nmehT89UjhPFfjD/hKNaljZt8SvtDhgcEnG8Dtz0Ppn1qpaRXVvIZ1lS7diSARsKEHPBJz9RXN2tnfzW880Vt9qiYsGmdfmQ9wvTGOpqudaktmMNqJgu4MxkwwPbr7etezHDuEVCnsiHq7yPTR4uubcrGUmeWNSvKjdtz+Gev8AnFWtP+ITRkSFJJREMrEV6KO5x/nj3rzq3vb4Wk00lslxAimTakuzGD9/H49Kq22uQXkqCS9f7ShB+YHOfZh1H1rto4zF0lpLQ5Z4WhLdHudh4xXVLfzEEY8xWOX+QKOcc56/41B/wkti1rI8t3GgCFssQ3z+hwf8+1eWQa1bStCiWT3IupBGGRdhnlOBsI6ZyQMdORXQreTQ2kk39kQx3rDy4jHsaRecYMYPGMkYx+FepSzuu7c6scMsspL4TqrPxna/ZjJcqFlLhQr/AC5HqPX1rZbXdKEAmWUMmBnIIPI44rw+5Jitbu51a1lhW0kSMJCP3gkYthWB4A+ViQSD0GOasaFe6fqwuI7RruG4giMrNdbTGY9wDKMZ2n5lwD17e9U8+xNOOquFTKqM3poe8xW0Nyu6NlwQCeemelOOl+1eZeFJtZj1OI+YttE2Db+djymXuwPQg84ORyCK9q0e1ubqxjkuZLeZjkeZCwKuR16cV7mBzj6xG7VjzcTl3sXZO5hDTgDyKkWw56V0jaZ6jn6U5dNA7V2vFowWHOfTTye1amlpPp11HcwcOh6diO4NaUen+xNXILNl5C1y168akHCeqZtCjZ3RgfFbwK3jTSrPW9DuTp+u2JMlldhivlscBlfAOVIyCMfzNeGaJ8QNC+H2jppeiXEvirWBK/2WeWzFvDp8knyuqM/OGYZxwPpzX1TpkTeXJbSH5JBlfY14B4h8D3Oj+P77R20fSb3w1r15DqDpfXYt1inTd5gQAhnOCzbcEcjNfl2IoRwteeFqawWsdlddr/pdX17n0uHqucFLqavwq8barY6h5/iE+Vq+m3B0/WUIUb43OUlwvHHqOPlPrX0opyM5BHtXynqusfD7QfGF5LDrM2parr0kdkyxTB4LGMBQoOOMZAA5JGewr6F+G+sSat4UtROxa5tC1pMT1JTgE/Vdpruymtq6drJ6rS3rbyvsRi4aKXy/yJfGchmgsdOB4u7ld49UT5j+oWvnHxf8IfH13qPiXUtO8T2IfXpn+1WS7kWWHP7tN5B5C8dsevNfROtnzvEsCn7trZvJ9C7Y/ktYkx3sSa8TNsxqUsbLktoktVfz/M6cJRUqaueQfB6XWIF8QTarpem6TBpgjsI7a0tUQGZAd778bmyNueSDmnDwTP4suJNWmuLFQ0UqxbpT5gUkrIcDoc7QM5HPNd94yn+z6HLjOXIWuC0b4Ka5dfa9Qk1gLJmGdNPkyqTbsuI3ePawyTtyrZHfOAK7Mjf1jETxDj8h4n3KaimMvfBdponh2zeMWqxKjtMEfc8pLAptxwS2QBxkjccCuK174d+JPLa4gsra8KQNey2xjCTOoZfMVQB82M8AjscA4rrNS0l/B+tpcQ2U1jPZySTQR29y93pkrDaZDIoXdGOSu4KOSDnIJr0nS7zSfHUVhrGka2BqT7XxCwzbRMpUrLGMgAOT97k54PSvq2qc9Gjg5qkdUz5c1bQLQW0GradJ9p065IMHDHMuTmB2PG8AZC9SCBWpcfDfU/7BguY4QfLR7i7aFQGt0DAEEA/NjPOeRg88V1vwq+Glz4o8Xa1ofiactpWj3ryXVnbzHa9y+5Q67ei8de2B05r26x+Hrp4VuvDM8hEcG+O2kY5RoGztDEYyQSCcjqo9ecVBO7RrKfLZSZ8k+VNYXK2OotKBgyw3cDbgpBO1wR/DleT7Z9DV3WdFh8UyrLYMZtc8hZJCcbr9+dxXaMeZ6EfeA67uT7h4R+HrazZwrPa21x/ZsqhZJBiSPAAeP/aA9G9Bzg4rG+L/AIcg8N+EE1bTTEZWdbaB0AHlTTHaw7nIVSVOcjNZJO10aTcU7M8lS6g8S6bc/YdJv7rVZ7UJeFAqW8cnmBvtDuT95sDg4+83Pap/Dlnc+D4rx9csNUtrS4aMPf6c8U3khCxCsASMF8Hkj7o610F9ZJpQTQNNWOS2slaKQR/IJ2xh3bd/y0yeo7YHAFXfDUsNtNDKbkARhYZkmUMJUxgowxypHBAPNcdTFqMrW0N44VuN7mb4F+GGqfF3WpNe1GF7XRFLRw/KR5wjHEKED5VHAZ/UnGSePePCPw8vfD+rmRbgJZ+SI444IwqQ7f8AlmB025JwcZPc5zXnvw38VQ/DvxN4n0GGWWPQ1MOpWayDcbcSYDLg/wC8B/wH3zXpll8ZfDsUaxXVzKsm9VLXA2lc9CR6H2r0qNelFpt6nBUpzaaWx2RsDtGfmPc+tAsQP4RWNP8AFDwxD5pS8NwsZ2FoFLgv/d49vyxXS6ff22pWy3NsQ8bAEMR7V2rGKTsmcroNatFdbNR0Wpltsfw1cUqOoBp6svoKHXYezRXigwQQORXlX7QHgex8VaJDPeXkGnx2Mou3upQSEiAxIOOeRj8QK9iEgrnvGem22raTPaXUYkt51aGRfVGGCP1r5jP5OPs8StHF/wBfqdmEVpcvc+OYtMnu9F1m28L+Ab2603Wrtf7H1FlLzWwjYZG7BOCRnkgdeTivqP4Szz6frGpaRdMDLJBFctg8eYoCuR9cj8qraVpdpoGk2ulaejx2lpEIYlZyxCj1J61FoE32P4kaY+cLcxyQN75Ukfqory8JmftcXBJWV36u9lr9yO2tQtSZL8VviE/gPULm4TQdV1d7mIQKbKPcsGELZc+nzfoa8Asf2hPFTW+jGa2eeU3ri7eO0XbdRZXEcX+2Pmzj+8te/fFf4bWnxAursXOo6lZy2S74RaTbFkZowMOMHIyo/M14JY/s6+IPJ0UXF0kcn2pzfiK7GIIcrtaLjlyN2fotdEpYF1ant7c3M9/n+n42Mqaqcq5T1W/8SL4r8N6bqKafe6elzclfs97HslXa2OR6HtXXXvxDt9EmktpLK9lWCHdujh3KByQoI7+1cbe+GofCnh7S9Jt7y8u4recsJruTfIdzZwT6VvL9ozlVRcE++RXn4PHvC83sPhb/AOGPSp4WFZXqbosw+L18Qaf/AGhZWElpG0RjKTqY5ZAGPyBT91Tk5I5IOBXzjpuv6R4W8K6pa3Fndad4ysdRma1urFzDPFkrgE94Rg5Ug9sda96n/t4RKYBYTSGQbt4ZAE79zk14zHpr3fx/jttQjtbyVXaSUso2kCMlRt6blGMfTNexhM0qVXN1LWSv9xFbA04JcvV2O/8Agla61oOg32rarZONX1G8+0s0zlZZVJUnfnsfmIB9c8V6fP45utsHkafJKZWwV8xEKDuSD1/DNZhiJUgZDEdS2KxG8LJBcf2hbTAaiqFIpbmd5VQHrwTXCs7r62aS9Db6hRe61Lep67feHNYutV0hoR9uXMlrOPkZ1XmRQMENxzjr9a8d8feKZvFUE2nX9tHa3GsyRrAVk3slwrZUnoUUng/UHtTvHmsN4Z1MG81ltU18sohitk+SIHsykHk+g5xXLjwXq3ia7bVdcu4Ld5Wz9n3BJCB2PZeB9a9DD4ipZVK8tP62RE8NCXuUY3l/W5qa14pvvFcFvALUf27AGiv7SV0hkaQD/WZc/OvfAweQOgBK3WljTraG78UX2n6fY+SX8uN1N0zZwERVH3+rBmXb0yRnNXdUt9Ek8LXMF94fjuRp9kbeylLEyLMTtjAdeWJdhhTkYHTiqOj+F4/CD3sD6dZXut6bcxs9xIgceVIitGyKxIyHDoeD35GBXRGpCcfaW2MJU6lOaot6s0NB8P31/pepa/drPFf6jLBFbaeV+cWiIdm/PTdhCMjnbnjIrlte8+zucqAEkVZGdI+Qyn5hkgHj0z3ruYviXObiFb7SijKxW7ZiCWB4IDHOeQO/bFV/E9vb3ySX0cZeKcbUUYIDccBTyK5HiJ+0vONl0OyGEj7O0XdnP6dqEVyUkugiSS8I1u+GLehHTJ4zmvafh94i17To10+QwypFxsOQYFPJG04zn+9zXlK6JYNHFqFptlw5DWzjaB+XT2rv/BOu21y7QLB5M8Yw6mXeMdtuecf4VhXxU6fv0WVHCRkrTVz1RvFV2GGEhIzz8hz/ADpg8V3/AMxItivYBSDXNtfx+pFQf2g2MAx5yRy5wB+VcX9rYv8An/ItZbS/lOo/4TK7U5dMD0VVP9at3fiJG8IX+sXaymK03yOFj+YqoycKOprzTUbzxHKwGnHSUGRuaWV2JGecDGOldvo9nd33w8v7aa9mgmu3mRJ48eZBuGAQe5HXNZYrGVatNRrSurmGKwlOlFShGzujw7Vf2jx/bF6NOsidN+xE2v2i3IlNzgY34bHl5zXQ/Df4nWvjfxD4cLxyx6rbyxNdhYSsIzJt+QknPBHX3ri9Z+Bvij+3dSFvqV/f2w04+TeyyqHupMD9wwLZC9eTxwK6v4beAtT8H6h4cfUtWvZLi4lgV9OcgxWpEoOAQSCfp6mvRjHAx5HRa5rq3c85uo0+bbU+idWixqlz/wBNrZG/IkH+lc06gMa7DXI9tzZz44JaFv8AgQyP1FfPPjDxVrc/j7WPDtxrOraDZ2ZjW0ttI0xri81EMuS6vghRnj2/OvOzPAynjaiWi3/Lt5iwtVKCudx40tzLpIcDlHDdK88b4rtDM8UulNiMkF1k9DjJrb8BXEFzpet+Gdl7DNZyfaFi1C9S5uikvO6TZkIdwPy5JGeetQ2mjWN1l5Uj89XKyblDHH4+3FYUoQouVOor2/U9fBy536mYvxdteg0y5b12sMj6g1414z8Uz6145uNa0WW5sp5CIllR8FAFCHkcj/69e46h8OdDvwWNoiyno6yMhH4jP8qpWHwf8L2U4njtZN6EHDXDSA/UHryf0FenhMXhaDc0ne1jTFYepVtFNJHnkOv+NPAbxnTfEMXiC0lUFkY+aVbuArHI/wB4HkVHbeM/Hvi+4uZYNet9PtpDgbm8pMeiDG724r0y7+FelXIIjnnTLf8APZuB7Yqo/wAI4cBRdl41PCmdgAOwHHH1rZY/DtXaXN3sZ/U2pWUny9rlTwJ4c8KeEFfU73WI7vVG3NPfXHypbL3YBug7buSeg64rP1Xxp4N8QyywWd3qf2lJ1iiKWzu92vB/dxj1ORgkHpwK6PT/AIZ2enTGVbmQbkEbr5hdXUnLKwK4KkAcGpv+FU+D4lma30iNJJpPMDtK5MHQYiKkFRwTyTgn0ArOGIwrk51ZNyHOniIWjQsl/W5zdvp9ut4mq3FhHpdrBLm00eSYyTCXbgTzlQcMOSsf8JJJ6c6Nxo0i2cN/a6na2+pWUTJAZ5WcXcTEZt5MD5V6kOeQ2T9K2p+E4NG1Oyg1aaW+0e9kFvBqEpxPZTN92OZhjejYwrnlT1plx4Mgt9dj0HRXY36xi6u7yYu0enxE4U7C2HlYg7VPHc+3W6jlNSjL3bdtLdb/AKmK9mqbjNPmuuut+ljE1DU9GsI5LfW4tS0cGMzfYGi3vN7QzAFGUn+Ppz04qDTNVQoJrecXWnNIPKkWTD2znokqnB3YHB5B7E135+F3hyeGdb6CXU5rhWRr26mdrlcj7ysTtUg9MLt9jTrj4b+H5LSOwit57aziZXFvDOVUsAfnc4y78nJJ9uBxWNTGYTlaVzajDF86crWMeGH/AEfbiKVG+bzQmGDdePxzV+04zNCFZn+Yso68Dn9K07DwfpmmxmOGa+VG42G4JA+npVp9JgjBVJZ4y3G5Su4dsDjivKnVi3oz14tdUZX9p3vnLGqs2BkjB5/GkGsSGPEoXcOrRnjP41JJ4chYvNJqOpiTsDICQTwMYHWmnw1ZggvNdPtyAGkB3Ad+nNF4DTfYYdat1Ub/ADQfXHWvWtDAg8Ead1zODLz1wxJ/livK7HwpbXl7HaRNKGkcJ/rOeT1/KvRfiP4ms/Bfh+NjdWVr5KpBb/ag5Rn6AbYwWY4BOAO3aufEJTap09Wzy8zqfDF+pYdcmsaGI3nxA0C3UfcnEp/4CC39K4zw78TNY1CSWffoXiPTofmuDoxlhvLRO7tbS/M6jvt5/lXoHw9iTWfHlxqEZ3w2dqSjjoS+Av6bq6MBgqkMXCM+/wDX9M8mtVTpSaPUdVtmurGVEGXA3p/vDkfyrxD456brFxY2WqaO2sXiTobVtKs5zFDM7crJM4IIRcHIyM8AkDNe9VxfivwtY+IdM1Lw5qMRksrxCwUHB2k5IB7EMM/lXu51T9nOnikttH6Hm4aW8T5k+H0w+HOpQs91ZTr5nl62mmR+dFbq5wrz3PCLsYjEaepySa9M122OmajKyqWhuRkbemfbFcX4j0DWo3kk1zTfD/h3wfpLGOxsr+4zbkjgTSQxDM7nqqkjr35rc8CeIf8AhMdEk0O/a4Op2EQmt5riAQte2pJEcwQcKONpHbA9a8jGR9oliI697fht269tN9z1MNU9lNL7i0ty86tGhmjTu4kwcfTrxVOfSIdRjT7bcXsid1e4YDIOQcA47VIytbyNHLhBGehwOaWObzisgOewxyDz+v0rlTa1ifUQcKkVJFi1hhtFAhV0I7vIzHrn16VoR6huX5CxI/hzWM140CyGeNowp6sRhh6d+fwp8Fyssf7lg2epJ5Pt7Y96mUW9WPlRrrfI52uQrDlSeQe1UL+G5uspDePAo6hG2gD06fWq6zKQdvKKT+8Bzz6Z7n6enapVl3R4G4ZG1Ay4JP0PPbqcUkuV3QciMbxdAreC/EL6he+XaJZsqByBvlyPKA4++XxjHoap/CbxCda0TXtbvLqKTU3vklvVBCssflKkTY/u8OPrmt26jgvraezvITPbzRmKaE874zwcnsR1HfIzWb4b8NWfhLS49OtZvtBDtLJchdrSuf4sH0XCgHpye9enCvT+qSpS3b/r8jzKuFqSxcai2/r8ddP+AdFHqVtL8wuIkB6qG5J7e2fb3p/2pg4XcOeuTjC461lvb2xlYGKM7PmfbyE46D1J9PzpSinzDkg4xuJ4VQO/69K83lXQ9TlLrzrIQj5YEjbgYz7jvTGlYyBS42hvmOcDA7Z9fYVXSUrIFLFpG5Ut1X6Lnp7k01JcvGqqDKBvwpz5Q+vQE/hijlHYklmYxykHIjPJ6ck9B74/LIqPznWaZsDeFVEUenriq0s6mEOv+rSXbEgJ/evn17/XGKuaZps2payLWD55GbNw45VFH3f/ANVVoldg5KKblsdb8O9MUzz6vKcxx/JFnnBH3ue/1rjfiZeXvjXxI2jaJNY3NxpDLcPbx3n2bUIrnqkkBYbW2qeR0OcHBwa9N1FZ9J0GS00aGJ7mGEmGOQ4V3AyFJ7ZPf1NeKadpF5r2lzRaRdWHiiOOR3utJ8QAWupabOSSzLMnzLhvw44NGBtKbrN7aK/6/wDBa9T5fF1XVm5Pr+RP4Rtb3XPEB8Taxrxk1Hw8JLWe1bTUtbne6kBZnQlXGMkYzz6V7t8INLNt4fm1SUfvdSmMgJ6mNflX9dx/GvKtB0DUo9K0bwtPJbzaxeFfttzAo/eNk/OzAfOVTqx6496+irGzh0+zgs7dNkMEaxovooGBX0OVU/aVpVui0X/A/rqedi5csFDq9WT1n6vatNAs0K5mhO9QP4h3X8R+uK0KK9yvRjWpunPZnBGTi7o+e/jf4GtrqW38bRxLcwWdu8V5bvbtcb4G/jjQMuJFyecjAJPavLZtV1e58Qyazp+lL4atNCktjm1Ef2azt9vzC6ccvJ5eFESjgsR16/W2o2S2k5GP9GnbIP8Azzk/wP8AOvnP4n/DjUdDt9VsbOW3tfCF5GJp5p7kqmnSeeJJZSnLTM2FC+n3fr8nRk6FR4WvutE3tZv+rfd5P0U+aPNE6Zb3S/HNpc6loy3MclrL5VxbXMBimjOMruQ8jIIIPesOSVo5gJuOwZ2y7+yqOgrD1d9b0i0h8d6akelSXswh0vTJSTLeK4/1k0Y5kllIXC5AjUA9hWzF4v0jxbpYlW0u7fXCAH0q3XzZZMsV8yIjh48gnd0wOe2eWWFcFzU9Y7eaf9dT1MHj/ZO0hks8DpiV1QbgoQnLFvbH9M1FDaRRl4rY3UW07mYqW3E9xnjsck9K5fxR4T1/SGZ9NubppJmJmndgCijsemAcnp14ro/Cd5dW1jGuuXCTOvKRoT8vPG5sc/QVpKmlTU4Sv5Hs0sR7R2UfmX4LqWQY/elyAqkx8r15wP6mpTL5QAhBwuFmwS7YzjoOT+YpbyRJZFfYgQnKhyck4/hjH/s1RhlG23gkH7lQXMjZ8sY7gcZ+tcx1IldXIkRVYhsCPGARgc/7K0isXf5WTZGAHk3bV6dNx6/QVBDJHJEm4O8Y+VN/LTY7KnTH1zQCzSjzMeac+VAihnVev0B+tFhksc0RKzSoY4k3BFbjzP8AaVO/fk0FmlKtLFkHDLahh8x/vv6CoGkZJR5mBeSkKuwea6D3J4BqKAgJMk4WYcnyo3yX93cepot1AswyiUXFy8wjjUbWuAvMjf3Uz0A/WoLh8WSBUaGEEZQuV8tc/ec+p9KiErS3H2i72CytTlUXhU9/f+ZzVjTtOuddeGIxu8Uh86UEYD+hP6ce1VZR1ZEpKKu2SW9vcX1+1tBgyBC9mANqqMYJ29Tyepru4Rpnw08K3esapKR5MfnXMwUlnbpwPUkgAe9Jt0zwXpV9rN8DJJa2/wBonES75AgHZeuODjt1968u8YavP4n1Sz8UDxZeReD7lRbW1zpj7RpVycYN3EQd6k5Bz0H650qbxMknpD8/Jef9a7HhY7Hc3ux2EGteI3u5PincXB+zW08UU+kw3KyCHTnXLblXI3jcsmScnJ4GK6zSG8PeO9GPivV/DVgZEnlitrt0P+lxI2FkGcNtPo2eh7Vwngb4cz+I4rXUrOaz0/SLq5c6qbcDJlt3Zf8ARj2ilBJI5A+YDjivYdI0FfGOrRaTawrb6FpwUTCIbU2j7sS+mQPwH4V3V6aqVVQofFtdaWS6P8fkebCXLFznt+bOh+FPh6R/P8T3qYkul8u0QjGyHPLAdt2Bj2HvXo9MiiSGNY40VEQBVVRgADoBT6+tw1CNCmqceh5VSo5ycmFFFFbmZHcW8dzC8UqhkcYINcxqelR3MUmm6hHHcRSqUUyKGWZMcqwPGcdRXV1DdWsV3CYpVyp59CD6j0NebmWXRxcO0lszWlVdNngPi7Q5vB2t6j491H7ZrsWnWoTS9Lihz9gY8Oy4424Ay2MgE+1cj8L/AAZa+L7qbxRrGq2Gp3sOpQ3qmwTiM+TkQmTqEXcB5a8DZz1r6PvbIxER3XKnhLgDg+zeh/Q15/448Eag/hafS/CxtNLnNwlyoUGKKQiQO6kpyu/HJFfJOtVoXw9X3ZOy5uy/rqtz0oOM/eX3eZxnij4jWWm+JNVstS0eSfR9N+zxTajaHc8NxKOI2Q/e+i5Ixz1pY9N07xHbyXXh3UbS/APzGMhngPoYzyp+ormbiFPB+vWNn4g88w6Mtz4m1G+lhKw6pqBA8tY2PUIWCjODntXDWRutL0vX9TubmO01n7JbQ+bp8jGSeS9m8/zHdT99EUjYPSu2GAhKCdN2213T6bfj5XWhpDF1Kcrpnpc+mXtjI67XjiHzy3P355MDGAMcVTtnedIUMX2KAAyhZcl2A/jk/HtUOheKvFb2mh20N7BqFvqF1qElvcaxbnzJ7CBFZZWK8rnDAH3HpXa+Dlh8UeCrfxJrenW2m/aI2n2wyF0EI5DnPToTj2Fc1aM6KvOz6afNbfJnqUc0b0kjljcPKGGn5LyfLJeSHGxfRfT8KVpBHbyRWk/kIRuubtgdzD29Paqg8c+GJdLvLufQ9aggghS5hiKLuubV5NgmQZGF3YyPcVZv/FHhqwuI9P1DSNZigXUY9Nd5YkWKGUqrAt83TawPriq9jVTtyP8AA3/tWla9hsd8zqTHGbPTYxjcf9ZcHHAz706C0n1B4I7e0lW2ALCJcgE+r+p9Kkk8c6ND4a8Qa7a6DcXA0O/jsDHPMB57FtpK7c4x6fSovFnxM1jwzrltPpraKNAnsoNStI2hPnX0TuqPGHzxINxOB2FEaNaUuWMbPzfkn9+pjPNVb3UdVZ+CXvWtjqMiwxlhtgJ2iVvp3qLW/iTovgy20a/tbJ73Sb28ms7m6jBD2rR5DZTGTghsjjhT7Vg/E/wPpl54+0q+1B7pbfXY5NPjnadh/Z96FDQSIM4XOMEdM5NQGyvPG3wPe/t7W4m177YJ5WtG/eXNzE4hd19C0YOSO+TzzUU6FOUYVKjvFtLsle6/Br8NrM4K+Kq1G090Ztrq1v4f1fxZq7o2r6+jy3SLLf7LfUtJmAZWUNw4QZwq4OT7EUvgn4YSaxdX0lnqGqWmjTSKjTsAINV014wY4lXA+dRgM5z7HIrqvDvwZ02G1lg8R28N5oyMsum6dd5ebTcgM6GYEbhuyCo+XjPeu7hS98RzjSdBjWOGIBJbjGI4F6Acd8dFH6Dmt5Ytyl7HC6ydlfp0t92vkvPQ51SSXNU0SM+2sDdG08I+F7eO3ggjCFkHyW0Q4yfX+bH8a9b8P6FZ+HNLi0+yQhE5Z2+9Ix6sx9T/APWqLw34ZsfDFgLW0Us7HdNO/wB+ZvVj/IdBWvX0OW5csLC8tZPdnn4jEe0dlsgooor1DmCiiigAooooAa8ayKUdQynggjINZdxpckIJtcSRd4HPT/dP9DWtRXLisHSxMeWqr/mXCbjscZqmh6drFvLY3lrFLHIMSWl3GGVvwPB+tef6l8ENBiawGkxy6IlldNeCG1AMU0pXaGcNknAJAweATjrXt09rDdJsmjVx2yOn+FZ8ujOgP2a5IH9yUbh+fWvmq2SYqg28LO67f8DZnZDFRek0fNM/ww8d6DbQxWP9laxHY6DcaPaFJDbyq0p5kIbIJwcdegrd8M6Z4m1D4eax4c1DRZNGFvpqadYQykF5G8gh3LA4IL9PTNe2TafOufNsi+P4oWB/Q81nzxW8fEgmh9pIyK83E1sVFctanre97Pvf0/4c6qcoX91ny42nap4x0G8a10XULf8AsLwmmlzJNAUMl0squUQd8BCam8RXFt4v8Parq8cF2ljf+IbL7M727Biws/LkbGOitjn2r6Uc2x6XUZx/tVEZLZP+XhBj0NNZs078m22vpfp3RfstNz5c0Sx1yLw1rGkJpetNe6i+m35khsmYpKkx80jIwSAVOO9dHF8KfFOoLY6DcaTHNpej3t3Bb319MiNLZTDqEXJDK3zr0wSBXvn2uBztjZ5j6IC38qnjsdWuf+PbS5VB/imxGP15/St1mGKqtujS316vW1vLoT7OEV70jh5Phw3iLwVp3h3xhqL6jJZyI8lxakwmbZkIGJyeh5PBJGa27KLSPCunW2j6TarFDCuyC1gBY9c8dSSTyTyTXVQeCr26wdR1Hy17xWo/9mP9BW/pegabo4P2O1RHIw0p+aRvqx5rahkmKrr9/Llje9v+BsZzxlOHwK7ON0/wbqmvOJdYZrCzPIt4z+9ce56IPzP0rutP0200q0S0sreO3gT7qIMD6+59zVmivp8JgaOFjy0l8+p51WvOq7yYUUUV2GQUUUUAf//Z';
+var LV={1:'Info',2:'Important',3:'Critique'};
+var ICON={
+ home:'M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10',
+ bus:'M5 4h14a1 1 0 011 1v11a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1zM4 11h16M7 20v-3M17 20v-3',
+ cal:'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
+ users:'M9 11a3 3 0 100-6 3 3 0 000 6zM3 20c0-3 3-5 6-5s6 2 6 5M16 5a3 3 0 010 6M18 15c2 .5 3 2.5 3 5',
+ user:'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21c0-4 4-6 8-6s8 2 8 6',
+ bell:'M6 16V11a6 6 0 1112 0v5l2 2H4zM10 21h4',
+ sos:'M12 3l10 18H2zM12 10v5M12 18v.01',
+ check:'M5 12l5 5 9-10',
+ x:'M6 6l12 12M18 6L6 18',
+ plus:'M12 5v14M5 12h14',
+ back:'M15 5l-7 7 7 7',
+ shield:'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z',
+ list:'M8 6h12M8 12h12M8 18h12M4 6v.01M4 12v.01M4 18v.01',
+ chart:'M4 20V10M10 20V4M16 20v-8M22 20H2',
+ key:'M14 10a4 4 0 11-3.9-4A4 4 0 0114 10zM11 13l-8 8M6 18l2 2'
+};
+function ic(n,c){return '<svg class="i '+(c||'')+'" viewBox="0 0 24 24" aria-hidden="true"><path d="'+ICON[n]+'"/></svg>'}
+var FLAG='<svg class="flag" viewBox="0 0 28 19" aria-label="Drapeau du Niger"><rect width="28" height="6.4" fill="#E05206"/><rect y="6.4" width="28" height="6.2" fill="#fff"/><rect y="12.6" width="28" height="6.4" fill="#0DB02B"/><circle cx="14" cy="9.5" r="2.6" fill="#E05206"/></svg>';
+
+function seed(){
+ var hh=function(p){return hash(p)};
+ return {v:2,session:null,
+ accounts:[
+  {id:'a1',role:'student',name:'Aïssa Demo',card:'UAZ-DEMO-0001',phone:'90000001',pass:hh('demo123'),status:'valid',filiere:'Informatique',annee:'L2',subs:['A:1'],toured:false},
+  {id:'a2',role:'student',name:'Moussa Demo',card:'UAZ-DEMO-0002',phone:'90000002',pass:hh('demo123'),status:'pending',filiere:'Économie',annee:'L1',subs:[],toured:true},
+  {id:'a3',role:'student',name:'Fati Demo',card:'UAZ-DEMO-0003',phone:'90000003',pass:hh('demo123'),status:'pending',filiere:'Droit',annee:'L1',subs:[],toured:true},
+  {id:'d1',role:'delegate',name:'Délégué général Demo',card:'',phone:'90000010',pass:hh('demo123'),status:'valid',filiere:'Informatique',annee:'L3',subs:[],toured:true},
+  {id:'c1',role:'driver',name:'Chauffeur Demo',card:'',phone:'90000020',pass:hh('demo123'),status:'valid',line:'A',subs:[],toured:true},
+  {id:'ad',role:'admin',name:'Administration Demo',card:'',phone:'90000099',pass:hh('demo123'),status:'valid',subs:[],toured:true}
+ ],
+ ann:[
+  {id:'n1',level:3,scope:'private',title:'Exemple : examen de rattrapage avancé à 8h',body:"Annonce critique d'exemple. Elle reste épinglée en haut de l'accueil de tous les étudiants du campus.",author:'Délégué général Demo',badge:true,t:now()-3600e3},
+  {id:'n2',level:2,scope:'private',title:'Réunion du bureau des délégués jeudi',body:"Exemple d'annonce importante : salle à confirmer, 16h.",author:'Délégué général Demo',badge:true,t:now()-86400e3},
+  {id:'n3',level:1,scope:'national',title:'Journée culturelle inter-universitaire',body:"Exemple d'annonce nationale visible sur tous les campus : concours d'éloquence et expositions.",author:'Administration Demo',badge:false,t:now()-2*86400e3}
+ ],
+ events:[
+  {id:'e1',date:addDays(0),time:'08:00',title:'Cours : Algorithmique',place:'Amphi A'},
+  {id:'e2',date:addDays(1),time:'10:00',title:'TD : Base de données',place:'Salle 12'},
+  {id:'e3',date:addDays(2),time:'15:00',title:'Conférence : Entrepreneuriat étudiant',place:'Grande salle'},
+  {id:'e4',date:addDays(4),time:'09:00',title:'Concours de débat',place:'Amphi B'},
+  {id:'e5',date:addDays(9),time:'14:00',title:'Journée culturelle',place:'Cour centrale'}
+ ],
+ lines:[
+  {id:'A',name:'Ligne A · Campus ↔ Centre-ville',stops:['Campus, entrée principale','Marché central','Gare routière','Rond-point du centre','Centre-ville'],ints:[5,6,4,7],sched:['07:00','08:30','12:30','17:00'],state:null,dis:null},
+  {id:'B',name:'Ligne B · Campus ↔ Résidences',stops:['Campus, entrée principale','Cité universitaire','Quartier Nord','Résidences étudiantes'],ints:[6,5,8],sched:['07:15','12:45','17:15'],state:null,dis:null}
+ ],
+ groups:[
+  {id:'g1',name:'Club de débat',desc:"Entraînements et concours d'éloquence.",members:['90000001']},
+  {id:'g2',name:'Club informatique',desc:'Projets, entraide et ateliers de code.',members:[]}
+ ],
+ lost:[
+  {id:'l1',kind:'perdu',text:'Carte étudiante au nom de A. Demo',place:'Amphi A',by:'Aïssa Demo',t:now()-86400e3,done:false}
+ ],
+ notifs:[],log:[],
+ codes:[{code:'L2-INFO-2026',classe:'Licence 2 Informatique (exemple)',uses:0}],
+ reqs:[]};
+}
+var S;
+function load(){try{var r=localStorage.getItem(KEY);if(r){S=JSON.parse(r);if(S&&S.v===2)return}}catch(e){}S=seed()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+load();
+var ui={screen:'grid',etab:'UAZ',tab:'home',modal:null,step:1,signup:null,otp:null,cal:'week',day:null,mo:0,comm:'groups',line:null,confirm:null,tour:0};
+
+function cur(){return S.accounts.find(function(a){return a.id===S.session})||null}
+function toast(m){var t=$('#toast');t.textContent=m;t.className='show';clearTimeout(toast.h);toast.h=setTimeout(function(){t.className=''},3200)}
+function log(t){S.log.unshift({t:now(),text:t});S.log=S.log.slice(0,40)}
+function notify(phone,text){S.notifs.unshift({id:uid(),to:phone,text:text,t:now(),read:false});S.notifs=S.notifs.slice(0,200)}
+function myNotifs(u){return S.notifs.filter(function(n){return n.to===u.phone})}
+function eta(L,j){if(!L.state||j<=L.state.idx)return null;var m=0;for(var k=L.state.idx;k<j;k++)m+=L.ints[k];return L.state.at+m*60000}
+function fmtEta(t){var m=Math.round((t-now())/60000);return m<=0?'Imminent':'~'+m+' min'}
+
+/* ---------- vues publiques ---------- */
+function topbar(u){
+ var n=u?myNotifs(u).filter(function(x){return !x.read}).length:0;
+ return '<div class="bar"><div class="wrap">'+(u?'<img class="lgo sm" src="'+LOGO+'" alt="">':'')+'<div><div class="logo">Uni<b>Niger</b></div><div class="sub">'+(u?esc(etabName())+' · '+roleName(u):'Votre campus dans la poche')+'</div></div><div class="sp"></div>'+
+ (u?'<button class="ib" data-a="modal" data-m="notifs" aria-label="Notifications">'+ic('bell')+(n?'<span class="dot">'+n+'</span>':'')+'</button><button class="ib" data-a="modal" data-m="sos" aria-label="SOS">'+ic('sos')+'</button>':'<button class="ib" data-a="modal" data-m="faq" aria-label="Aide">'+ic('list')+'</button>')+
+ '</div></div>';
+}
+function roleName(u){return {student:u.status==='pending'?'Étudiant (en attente)':'Étudiant',delegate:'Délégué officiel',driver:'Chauffeur',admin:'Administration'}[u.role]}
+function etabName(){return ETAB[0].name}
+
+function viewGrid(){
+ var g=function(t){return ETAB.filter(function(e){return e.type===t}).map(est).join('')};
+ return topbar(null)+'<div class="wrap"><main>'+
+ '<div class="hero"><div class="row">'+FLAG+'<span class="sub" style="opacity:1">Niger · Application étudiante</span></div><h1>Bus, planning, annonces et sécurité de votre campus, <span class="gl">au même endroit</span>.</h1><p>Choisissez votre établissement pour créer votre compte ou vous connecter.</p><div class="row"><button class="btn gold" data-a="pick" data-id="UAZ">Commencer avec UniAgadez</button><button class="btn ghost" style="color:#fff;border-color:#fff" data-a="gologin">Se connecter</button></div></div>'+
+ '<div class="demo"><b>Version de démonstration.</b> Les données sont fictives et restent dans votre navigateur. Les SMS sont simulés. Aucun étudiant réel n\'est enregistré.</div>'+
+ '<div class="sec">Universités publiques</div><div class="grid">'+g('univ')+'</div>'+
+ '<div class="sec">Instituts et écoles</div><div class="grid">'+g('inst')+'</div>'+
+ '<div class="card"><h3>Votre établissement n\'est pas dans la liste ?</h3><p class="muted small">Écoles privées et instituts : demandez l\'ouverture d\'un espace dédié.</p><div style="margin-top:10px"><button class="btn ghost" data-a="modal" data-m="req">Demander l\'ouverture</button></div></div>'+
+ '<div class="row small muted" style="justify-content:center"><button class="lk" data-a="modal" data-m="charte">Charte d\'utilisation</button><button class="lk" data-a="modal" data-m="privacy">Confidentialité</button><button class="lk" data-a="modal" data-m="faq">FAQ</button></div>'+
+ '</main></div>';
+}
+function est(e){
+ return '<button class="est'+(e.on?' on':' off')+'" '+(e.on?'data-a="pick" data-id="'+e.id+'"':'disabled')+'>'+(e.logo?'<img class="lgo" src="'+LOGO+'" alt="Logo '+esc(e.full)+'">':'<div class="mk">'+esc(e.id)+'</div>')+'<b>'+esc(e.name)+'</b><span class="n">'+esc(e.full)+'</span><span class="pill'+(e.on?' ok':'')+'">'+(e.on?'Campus pilote':'Bientôt disponible')+'</span></button>';
+}
+function viewInfo(){
+ var e=ETAB[0];
+ return topbar(null)+'<div class="wrap"><main>'+
+ '<button class="lk" data-a="gogrid" style="align-self:flex-start">'+ic('back','s')+' Tous les établissements</button>'+
+ '<div class="card stack"><div class="row"><img class="lgo" src="'+LOGO+'" alt="Logo '+esc(e.full)+'"><div><h3 style="margin:0">'+esc(e.name)+'</h3><div class="muted small">'+esc(e.full)+' · '+esc(e.city)+'</div></div></div>'+
+ '<p>Rejoignez l\'espace de votre établissement pour suivre les bus arrêt par arrêt, consulter le planning et recevoir les annonces officielles de vos délégués.</p></div>'+
+ '<div class="card"><h3>Conditions pour s\'inscrire</h3><div class="stack small">'+
+ '<div class="row" style="flex-wrap:nowrap">'+ic('check','s')+'<span>Être étudiant de l\'établissement et avoir votre numéro de carte.</span></div>'+
+ '<div class="row" style="flex-wrap:nowrap">'+ic('check','s')+'<span>Un numéro de téléphone que vous pouvez utiliser : un code vous est envoyé par SMS.</span></div>'+
+ '<div class="row" style="flex-wrap:nowrap">'+ic('check','s')+'<span>Validation par un délégué de votre classe, ou un code d\'activation donné par votre délégué.</span></div>'+
+ '<div class="row" style="flex-wrap:nowrap">'+ic('check','s')+'<span>Accepter la charte d\'utilisation.</span></div></div></div>'+
+ '<div class="demo">UniNiger est une application étudiante indépendante. Le logo est affiché à titre de démonstration, en attendant l\'accord officiel de l\'université.</div>'+'<button class="btn gold full" data-a="goform">M\'inscrire</button>'+
+ '<button class="btn ghost full" data-a="gologin">J\'ai déjà un compte</button>'+
+ '</main></div>';
+}
+function viewForm(){
+ var back='<button class="lk" data-a="goinfo" style="align-self:flex-start">'+ic('back','s')+' Retour</button>';
+ if(ui.step===2){
+  return topbar(null)+'<div class="wrap"><main>'+back+'<div class="card stack"><h3>Vérifiez votre téléphone</h3><p class="muted small">Un code à 6 chiffres est envoyé au '+esc(ui.signup.phone)+'.</p>'+
+  '<div class="demo"><b>SMS simulé.</b> Dans la version réelle, ce code arrive par SMS. Pour la démonstration, votre code est : <b style="font-size:18px;letter-spacing:.1em">'+esc(ui.otp)+'</b></div>'+
+  '<form data-form="otp" class="stack"><div><label for="otp">Code reçu par SMS</label><input id="otp" name="otp" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required></div>'+
+  '<div><label for="cc">Code d\'activation de classe (facultatif)</label><input id="cc" name="cc" placeholder="Ex. L2-INFO-2026" autocapitalize="characters"><div class="muted small" style="margin-top:4px">Si votre délégué vous en a donné un, votre compte est validé tout de suite. Sinon un délégué valide votre inscription. Essayez L2-INFO-2026.</div></div>'+
+  '<button class="btn gold full" type="submit">Valider et entrer</button></form>'+
+  '<button class="lk" data-a="resend">Renvoyer un code</button></div></main></div>';
+ }
+ return topbar(null)+'<div class="wrap"><main>'+back+'<div class="card stack"><h3>Inscription · '+esc(ETAB[0].name)+'</h3>'+
+ '<form data-form="signup" class="stack">'+
+ '<div><label for="prenom">Prénom</label><input id="prenom" name="prenom" required autocomplete="given-name"></div>'+
+ '<div><label for="nom">Nom</label><input id="nom" name="nom" required autocomplete="family-name"></div>'+
+ '<div><label for="card">Numéro de carte d\'étudiant</label><input id="card" name="card" required placeholder="Ex. UAZ-2026-1234" autocapitalize="characters"></div>'+
+ '<div><label for="phone">Téléphone (8 chiffres)</label><input id="phone" name="phone" inputmode="tel" required placeholder="90 00 00 00" autocomplete="tel"></div>'+
+ '<div><label for="filiere">Filière</label><input id="filiere" name="filiere" required></div>'+
+ '<div><label for="annee">Année</label><select id="annee" name="annee"><option>L1</option><option>L2</option><option>L3</option><option>M1</option><option>M2</option></select></div>'+
+ '<div><label for="pass">Mot de passe (6 caractères minimum)</label><input id="pass" name="pass" type="password" minlength="6" required autocomplete="new-password"></div>'+
+ '<label class="chk" for="ok"><input id="ok" name="ok" type="checkbox"><span>J\'accepte la <button type="button" class="lk" data-a="modal" data-m="charte" style="padding:0">charte d\'utilisation</button> et la politique de confidentialité.</span></label>'+
+ '<button class="btn gold full" type="submit">Recevoir mon code SMS</button></form>'+
+ '<div class="demo">Pour tester, utilisez des données fictives. Ne saisissez pas votre vrai numéro de carte.</div></div></main></div>';
+}
+function viewLogin(){
+ return topbar(null)+'<div class="wrap"><main><button class="lk" data-a="gogrid" style="align-self:flex-start">'+ic('back','s')+' Accueil</button>'+
+ '<div class="card stack"><h3>Connexion</h3><form data-form="login" class="stack">'+
+ '<div><label for="lp">Téléphone</label><input id="lp" name="phone" inputmode="tel" required autocomplete="tel"></div>'+
+ '<div><label for="lw">Mot de passe</label><input id="lw" name="pass" type="password" required autocomplete="current-password"></div>'+
+ '<button class="btn full" type="submit">Se connecter</button></form>'+
+ '<div class="row"><button class="lk" data-a="modal" data-m="reset">Mot de passe oublié</button></div></div>'+
+ '<div class="card stack"><h3>Comptes de démonstration</h3><p class="muted small">Mot de passe : demo123. Ouvrez le site dans deux onglets pour voir le chauffeur et l\'étudiant réagir en direct.</p>'+
+ '<div class="grid"><button class="btn ghost sm" data-a="demo" data-p="90000001">Étudiant</button><button class="btn ghost sm" data-a="demo" data-p="90000002">Étudiant en attente</button><button class="btn ghost sm" data-a="demo" data-p="90000010">Délégué</button><button class="btn ghost sm" data-a="demo" data-p="90000020">Chauffeur</button><button class="btn ghost sm" data-a="demo" data-p="90000099">Admin</button></div></div>'+
+ '</main></div>';
+}
+
+/* ---------- espace connecté ---------- */
+function tabsFor(u){
+ if(u.role==='student')return u.status==='pending'?[['home','Accueil','home'],['prof','Profil','user']]:[['home','Accueil','home'],['bus','Bus','bus'],['plan','Planning','cal'],['comm','Campus','users'],['prof','Profil','user']];
+ if(u.role==='delegate')return [['valid','Validations','check'],['ann','Annonces','list'],['bus','Bus','bus'],['codes','Codes','key'],['prof','Profil','user']];
+ if(u.role==='driver')return [['drive','Ma ligne','bus'],['prof','Profil','user']];
+ return [['dash','Tableau','chart'],['acc','Comptes','users'],['valid','Validations','check'],['ann','Annonces','list'],['prof','Profil','user']];
+}
+function defTab(u){return tabsFor(u)[0][0]}
+function viewApp(u){
+ var tabs=tabsFor(u);
+ if(!tabs.some(function(t){return t[0]===ui.tab}))ui.tab=tabs[0][0];
+ var body;
+ switch(ui.tab){
+  case 'home':body=vHome(u);break;case 'bus':body=vBus(u);break;case 'plan':body=vPlan(u);break;
+  case 'comm':body=vComm(u);break;case 'prof':body=vProf(u);break;case 'valid':body=vValid(u);break;
+  case 'ann':body=vAnn(u);break;case 'codes':body=vCodes(u);break;case 'drive':body=vDrive(u);break;
+  case 'dash':body=vDash(u);break;case 'acc':body=vAcc(u);break;default:body='';
+ }
+ return topbar(u)+'<div class="wrap"><main>'+(navigator.onLine===false?'<div class="off-b">Hors ligne : vous voyez les dernières informations enregistrées.</div>':'')+body+'</main></div>'+
+ '<nav class="tabs" aria-label="Navigation"><div class="wrap">'+tabs.map(function(t){return '<button class="tab'+(ui.tab===t[0]?' on':'')+'" data-a="tab" data-t="'+t[0]+'">'+ic(t[2])+'<span>'+t[1]+'</span></button>'}).join('')+'</div></nav>';
+}
+function annList(u,canDel){
+ var l=S.ann.slice().sort(function(a,b){return (b.level===3)-(a.level===3)||b.t-a.t});
+ return l.map(function(a){return annCard(a,canDel)}).join('')||'<p class="muted">Aucune annonce.</p>';
+}
+function annCard(a,canDel){
+ return '<div class="ann l'+a.level+'"><div class="ann-h"><span class="chip c'+a.level+'">'+LV[a.level]+'</span><span class="chip '+(a.scope==='national'?'cn':'cp')+'">'+(a.scope==='national'?'National':'Mon campus')+'</span>'+(a.level===3?'<span class="pinx">Épinglée</span>':'')+'</div><h4>'+esc(a.title)+'</h4><p class="small">'+esc(a.body)+'</p><div class="meta">'+esc(a.author)+(a.badge?' <span class="badge">Délégué officiel</span>':'')+' · '+new Date(a.t).toLocaleDateString('fr-FR')+'</div>'+(canDel?'<div><button class="lk" data-a="delann" data-id="'+a.id+'">Supprimer</button></div>':'')+'</div>';
+}
+function vHome(u){
+ var h='';
+ if(u.status==='pending')h+='<div class="card" style="border-color:var(--gold)"><h3>Inscription en attente</h3><p class="small muted">Un délégué doit confirmer que vous êtes bien étudiant. En attendant, vous voyez les annonces. Les bus, le planning et les groupes s\'ouvrent après validation. Un code d\'activation de classe accélère la démarche.</p><div style="margin-top:10px"><button class="btn gold sm" data-a="modal" data-m="code">Saisir un code de classe</button></div></div>';
+ h+='<h2 style="font-size:20px">Bonjour '+esc(u.name.split(' ')[0])+'</h2>';
+ if(u.status==='valid'){
+  var subs=(u.subs||[]);var items=[];
+  S.lines.forEach(function(L){L.stops.forEach(function(s,j){if(subs.indexOf(L.id+':'+j)>-1){var t=eta(L,j);items.push('<div class="num"><span>'+esc(s)+' <span class="muted small">(ligne '+L.id+')</span></span><b>'+(t?fmtEta(t):'En attente')+'</b></div>')}})});
+  h+='<div class="card"><h3>Mes arrêts</h3>'+(items.join('')||'<p class="muted small">Activez la cloche sur un arrêt dans l\'onglet Bus pour être prévenu quand le bus approche.</p>')+'</div>';
+ }
+ h+='<div class="sec">Annonces</div>'+annList(u,false);
+ return h;
+}
+function vBus(u){
+ var h='<div class="card"><h3>Comment ça marche</h3><p class="small muted">Le chauffeur appuie sur un bouton à chaque arrêt. Activez la cloche d\'un arrêt pour être prévenu à l\'approche du bus.</p></div>';
+ S.lines.forEach(function(L){
+  h+='<div class="card"><h3>'+esc(L.name)+'</h3>';
+  if(L.dis)h+='<div class="ann l3" style="margin:6px 0"><div class="ann-h"><span class="chip c3">Perturbation</span></div><p class="small">'+esc(L.dis.text)+'</p><div class="meta">Signalé à '+hhmm(L.dis.t)+'</div></div>';
+  h+='<div class="stops">';
+  L.stops.forEach(function(s,j){
+   var st=L.state,cls='',right='';
+   if(st&&j<st.idx){cls='pass';right='Passé · '+hhmm(st.times[j])}
+   else if(st&&j===st.idx){cls='here';right='Bus ici'}
+   else if(st){right=fmtEta(eta(L,j))}
+   else right='En attente du chauffeur';
+   var on=(u.subs||[]).indexOf(L.id+':'+j)>-1;
+   h+='<div class="stop"><span class="pt '+cls+'"></span><div class="st"><b>'+esc(s)+'</b><span class="muted small">'+right+'</span></div><button class="bell'+(on?' on':'')+'" data-a="sub" data-k="'+L.id+':'+j+'" aria-pressed="'+on+'" aria-label="Alerte pour '+esc(s)+'">'+ic('bell','s')+'</button></div>';
+  });
+  h+='</div><div class="muted small" style="margin-top:6px">Horaires théoriques de départ : '+L.sched.join(' · ')+'</div></div>';
+ });
+ h+='<div class="card"><h3>Pas de connexion ?</h3><p class="small muted">Les horaires théoriques restent visibles hors ligne. Dans la version réelle, un SMS de secours donnera la position du bus (service à brancher avec un opérateur).</p></div>';
+ return h;
+}
+function eventsAll(){return S.events.slice().sort(function(a,b){return (a.date+a.time)<(b.date+b.time)?-1:1})}
+function evRow(e){return '<div class="ev"><div class="t">'+esc(e.time)+'</div><div><b>'+esc(e.title)+'</b><div class="muted small">'+esc(e.place)+'</div></div></div>'}
+function vPlan(u){
+ var h='<div class="seg"><button class="'+(ui.cal==='week'?'on':'')+'" data-a="cal" data-v="week">Semaine</button><button class="'+(ui.cal==='month'?'on':'')+'" data-a="cal" data-v="month">Mois</button><button class="'+(ui.cal==='year'?'on':'')+'" data-a="cal" data-v="year">Année</button></div>';
+ var ev=eventsAll();
+ if(ui.cal==='week'){
+  for(var i=0;i<7;i++){var d=addDays(i);var l=ev.filter(function(e){return e.date===d});h+='<div class="card"><h3>'+(i===0?'Aujourd\'hui · ':'')+fdate(d)+'</h3>'+(l.map(evRow).join('')||'<p class="muted small">Rien de prévu.</p>')+'</div>'}
+ }else if(ui.cal==='month'){
+  var b=new Date();b.setDate(1);b.setMonth(b.getMonth()+ui.mo);var y=b.getFullYear(),m=b.getMonth();
+  var first=(b.getDay()+6)%7,nd=new Date(y,m+1,0).getDate(),today=dstr(new Date());
+  h+='<div class="card"><div class="row" style="justify-content:space-between"><button class="btn ghost sm" data-a="mo" data-d="-1">Précédent</button><b>'+MONTHS[m]+' '+y+'</b><button class="btn ghost sm" data-a="mo" data-d="1">Suivant</button></div><div class="cal" style="margin-top:10px">'+['L','M','M','J','V','S','D'].map(function(x){return '<div class="h">'+x+'</div>'}).join('');
+  for(var k=0;k<first;k++)h+='<div style="border:0;background:none"></div>';
+  for(var dd=1;dd<=nd;dd++){var ds=y+'-'+String(m+1).padStart(2,'0')+'-'+String(dd).padStart(2,'0');var has=ev.some(function(e){return e.date===ds});h+='<button data-a="day" data-d="'+ds+'" class="'+(ds===today?'today ':'')+(ui.day===ds?'sel':'')+'">'+dd+(has?'<i></i>':'')+'</button>'}
+  h+='</div></div>';
+  if(ui.day){var l2=ev.filter(function(e){return e.date===ui.day});h+='<div class="card"><h3>'+fdate(ui.day)+'</h3>'+(l2.map(evRow).join('')||'<p class="muted small">Rien de prévu ce jour.</p>')+'</div>'}
+ }else{
+  var yy=new Date().getFullYear();h+='<div class="grid">';
+  for(var mm=0;mm<12;mm++){var c=ev.filter(function(e){var D=pd(e.date);return D.getFullYear()===yy&&D.getMonth()===mm}).length;h+='<button class="est" data-a="gomonth" data-m="'+mm+'"><b>'+MONTHS[mm]+'</b><span class="n">'+c+' événement'+(c>1?'s':'')+'</span></button>'}
+  h+='</div>';
+ }
+ return h;
+}
+function vComm(u){
+ var h='<div class="seg"><button class="'+(ui.comm==='groups'?'on':'')+'" data-a="comm" data-v="groups">Groupes</button><button class="'+(ui.comm==='lost'?'on':'')+'" data-a="comm" data-v="lost">Objets perdus</button></div>';
+ if(ui.comm==='groups'){
+  S.groups.forEach(function(g){var m=g.members.indexOf(u.phone)>-1;h+='<div class="card"><h3>'+esc(g.name)+'</h3><p class="small muted">'+esc(g.desc)+'</p><div class="row" style="justify-content:space-between;margin-top:8px"><span class="small muted">'+g.members.length+' membre'+(g.members.length>1?'s':'')+'</span><button class="btn sm'+(m?' ghost':'')+'" data-a="join" data-id="'+g.id+'">'+(m?'Quitter':'Rejoindre')+'</button></div></div>'});
+  h+='<div class="card"><h3>Créer un groupe</h3><form data-form="group" class="stack"><div><label for="gn">Nom</label><input id="gn" name="name" required></div><div><label for="gd">Description</label><input id="gd" name="desc" required></div><button class="btn" type="submit">Créer</button></form></div>';
+ }else{
+  S.lost.slice().sort(function(a,b){return b.t-a.t}).forEach(function(l){h+='<div class="card"><div class="ann-h"><span class="chip '+(l.kind==='perdu'?'c2':'cn')+'">'+(l.kind==='perdu'?'Perdu':'Trouvé')+'</span>'+(l.done?'<span class="pill ok">Résolu</span>':'')+'</div><p style="margin-top:6px"><b>'+esc(l.text)+'</b></p><div class="muted small">'+esc(l.place)+' · '+esc(l.by)+' · '+new Date(l.t).toLocaleDateString('fr-FR')+'</div>'+(!l.done&&(l.by===u.name)?'<div><button class="lk" data-a="resolve" data-id="'+l.id+'">Marquer comme résolu</button></div>':'')+'</div>'});
+  h+='<div class="card"><h3>Signaler un objet</h3><form data-form="lost" class="stack"><div><label for="lk">Type</label><select id="lk" name="kind"><option value="perdu">J\'ai perdu</option><option value="trouvé">J\'ai trouvé</option></select></div><div><label for="lt">Objet</label><input id="lt" name="text" required></div><div><label for="lpl">Lieu</label><input id="lpl" name="place" required></div><button class="btn" type="submit">Publier</button></form></div>';
+ }
+ return h;
+}
+function vProf(u){
+ return '<div class="card stack"><div class="row"><div class="mk">'+esc(u.name.split(' ').map(function(x){return x[0]}).slice(0,2).join(''))+'</div><div><h3 style="margin:0">'+esc(u.name)+'</h3><div class="muted small">'+roleName(u)+(u.role==='delegate'?' <span class="badge">Délégué officiel</span>':'')+'</div></div></div>'+
+ '<div class="num"><span class="muted">Téléphone</span><b>'+esc(u.phone)+'</b></div>'+(u.card?'<div class="num"><span class="muted">Carte</span><b>'+esc(u.card)+'</b></div>':'')+(u.filiere?'<div class="num"><span class="muted">Filière</span><b>'+esc(u.filiere)+' · '+esc(u.annee||'')+'</b></div>':'')+'</div>'+
+ '<div class="card stack"><button class="btn ghost" data-a="modal" data-m="sos">Numéros utiles et SOS</button><button class="btn ghost" data-a="modal" data-m="tour">Revoir le tutoriel</button><button class="btn ghost" data-a="modal" data-m="charte">Charte d\'utilisation</button><button class="btn ghost" data-a="modal" data-m="privacy">Confidentialité</button><button class="btn ghost" data-a="modal" data-m="faq">FAQ</button></div>'+
+ '<button class="btn red" data-a="logout">Se déconnecter</button>'+
+ '<button class="lk" data-a="reset">Réinitialiser les données de démonstration</button>';
+}
+function pendingList(){return S.accounts.filter(function(a){return a.role==='student'&&a.status==='pending'})}
+function vValid(u){
+ var p=pendingList();
+ var h='<div class="card"><h3>Inscriptions à valider ('+p.length+')</h3><p class="small muted">Vérifiez le nom et le numéro de carte avec la liste de votre classe avant de valider. Un compte validé accède à tout.</p>'+
+ (p.map(function(a){return '<div class="who"><div><b>'+esc(a.name)+'</b><div class="muted small">Carte '+esc(a.card)+' · '+esc(a.filiere)+' '+esc(a.annee)+'<br>Tél. '+esc(a.phone.slice(0,2))+' •• •• '+esc(a.phone.slice(-2))+'</div></div><div class="row"><button class="btn sm" data-a="valid" data-id="'+a.id+'">Valider</button><button class="btn sm red" data-a="reject" data-id="'+a.id+'">Refuser</button></div></div>'}).join('')||'<p class="muted" style="margin-top:8px">Aucune inscription en attente.</p>')+'</div>';
+ var v=S.accounts.filter(function(a){return a.role==='student'&&a.status==='valid'}).length;
+ return h+'<div class="stat"><div><b>'+v+'</b><span class="muted small">étudiants validés</span></div><div><b>'+p.length+'</b><span class="muted small">en attente</span></div></div>';
+}
+function vAnn(u){
+ return '<div class="card"><h3>Publier une annonce</h3><form data-form="ann" class="stack"><div><label for="at">Titre</label><input id="at" name="title" required></div><div><label for="ab">Message</label><textarea id="ab" name="body" required></textarea></div>'+
+ '<div><label for="al">Urgence</label><select id="al" name="level"><option value="1">Info</option><option value="2">Important</option><option value="3">Critique (épinglée, alerte à tous)</option></select></div>'+
+ '<div><label for="as">Diffusion</label><select id="as" name="scope"><option value="private">Mon campus uniquement</option><option value="national">Tous les campus</option></select></div>'+
+ '<div><label for="ad">Date de l\'événement (facultatif, ajoute au planning)</label><input id="ad" name="date" type="date"></div><div><label for="atm">Heure</label><input id="atm" name="time" type="time"></div>'+
+ '<button class="btn gold" type="submit">Publier</button></form></div><div class="sec">Annonces publiées</div>'+annList(u,true);
+}
+function vCodes(u){
+ return '<div class="card"><h3>Codes d\'activation de classe</h3><p class="small muted">Donnez un code à votre classe : les étudiants qui le saisissent à l\'inscription sont validés tout de suite.</p>'+
+ S.codes.map(function(c){return '<div class="num"><span><b>'+esc(c.code)+'</b><br><span class="muted small">'+esc(c.classe)+'</span></span><b>'+c.uses+' utilisation'+(c.uses>1?'s':'')+'</b></div>'}).join('')+'</div>'+
+ '<div class="card"><h3>Créer un code</h3><form data-form="code" class="stack"><div><label for="cl">Classe</label><input id="cl" name="classe" placeholder="Ex. Licence 3 Droit" required></div><button class="btn" type="submit">Générer un code</button></form></div>';
+}
+function lineProgress(L){return L.state?'Dernier arrêt signalé : '+esc(L.stops[L.state.idx])+' à '+hhmm(L.state.at):'Pas encore parti'}
+function vDrive(u){
+ var L=S.lines.find(function(l){return l.id===u.line});
+ if(!L)return '<div class="card">Aucune ligne assignée.</div>';
+ var next=L.state?L.state.idx+1:0,last=L.stops.length-1;
+ var h='<div class="card stack"><h3>'+esc(L.name)+'</h3><p class="small muted">'+lineProgress(L)+'</p>';
+ if(L.dis)h+='<div class="ann l3"><div class="ann-h"><span class="chip c3">Perturbation signalée</span></div><p class="small">'+esc(L.dis.text)+'</p><div><button class="btn sm ghost" data-a="cleardis" data-id="'+L.id+'">Rétablir la circulation</button></div></div>';
+ if(next<=last)h+='<button class="btn gold full" style="min-height:64px;font-size:17px" data-a="arrive" data-l="'+L.id+'" data-i="'+next+'">Je suis arrivé : '+esc(L.stops[next])+'</button>';
+ else h+='<button class="btn full" style="min-height:64px" data-a="endtrip" data-l="'+L.id+'">Terminer le trajet</button>';
+ h+='<button class="btn red full" data-a="modal" data-m="problem">Signaler un problème</button></div>';
+ h+='<div class="card"><h3>Arrêts</h3><div class="stops">'+L.stops.map(function(s,j){var st=L.state;var c=st&&j<st.idx?'pass':st&&j===st.idx?'here':'';return '<div class="stop"><span class="pt '+c+'"></span><div class="st"><b>'+esc(s)+'</b>'+(st&&j<=st.idx?'<span class="muted small">Signalé à '+hhmm(st.times[j])+'</span>':'')+'</div></div>'}).join('')+'</div></div>';
+ return h;
+}
+function vDash(u){
+ var st=S.accounts.filter(function(a){return a.role==='student'});
+ return '<div class="stat"><div><b>'+st.filter(function(a){return a.status==='valid'}).length+'</b><span class="muted small">étudiants validés</span></div><div><b>'+pendingList().length+'</b><span class="muted small">en attente</span></div><div><b>'+S.accounts.filter(function(a){return a.role==='driver'}).length+'</b><span class="muted small">chauffeurs</span></div><div><b>'+S.ann.length+'</b><span class="muted small">annonces</span></div></div>'+
+ '<div class="card"><h3>Bus</h3>'+S.lines.map(function(L){return '<div class="num"><span>'+esc(L.name)+'<br><span class="muted small">'+lineProgress(L)+'</span></span><b>'+(L.dis?'Perturbée':'Normale')+'</b></div>'}).join('')+'</div>'+
+ '<div class="card"><h3>Demandes d\'ouverture</h3>'+(S.reqs.map(function(r){return '<div class="num"><span><b>'+esc(r.name)+'</b><br><span class="muted small">'+esc(r.city)+' · '+esc(r.contact)+'</span></span></div>'}).join('')||'<p class="muted small">Aucune demande.</p>')+'</div>'+
+ '<div class="card"><h3>Journal d\'activité</h3>'+(S.log.slice(0,12).map(function(l){return '<div class="num"><span class="small">'+esc(l.text)+'</span><span class="muted small">'+hhmm(l.t)+'</span></div>'}).join('')||'<p class="muted small">Rien pour le moment.</p>')+'</div>';
+}
+function vAcc(u){
+ return '<div class="card"><h3>Créer un compte chauffeur</h3><form data-form="driver" class="stack"><div><label for="dn">Nom</label><input id="dn" name="name" required></div><div><label for="dp">Téléphone (8 chiffres)</label><input id="dp" name="phone" inputmode="tel" required></div><div><label for="dl">Ligne</label><select id="dl" name="line">'+S.lines.map(function(L){return '<option value="'+L.id+'">Ligne '+L.id+'</option>'}).join('')+'</select></div><div><label for="dw">Mot de passe provisoire</label><input id="dw" name="pass" minlength="6" required></div><button class="btn" type="submit">Créer</button></form></div>'+
+ '<div class="card"><h3>Comptes</h3>'+S.accounts.map(function(a){var can=a.id!==u.id;return '<div class="who"><div><b>'+esc(a.name)+'</b><div class="muted small">'+roleName(a)+' · '+esc(a.phone)+'</div></div>'+(can?(ui.confirm===a.id?'<div class="row"><button class="btn sm red" data-a="delacc" data-id="'+a.id+'">Confirmer</button><button class="btn sm ghost" data-a="noconf">Annuler</button></div>':'<button class="btn sm ghost" data-a="askdel" data-id="'+a.id+'">Retirer</button>'):'')+'</div>'}).join('')+'</div>';
+}
+
+/* ---------- fenêtres ---------- */
+function modals(u){
+ var m=ui.modal;if(!m)return '';
+ var close='<button class="btn ghost full" data-a="closem">Fermer</button>',b='';
+ if(m==='sos'){b='<h3>SOS et numéros utiles</h3><button class="btn red full" style="min-height:60px;font-size:17px" data-a="sossend">Envoyer une alerte SOS aux délégués</button><div class="demo">Démonstration : l\'alerte est enregistrée pour les délégués de ce navigateur. Dans la version réelle, elle partira avec votre nom et votre dernière position connue.</div><div class="num"><span>Police secours</span><b>17</b></div><div class="num"><span>Sapeurs-pompiers</span><b>18</b></div><div class="num"><span>SAMU</span><b>15</b></div><div class="num"><span>Infirmerie du campus</span><b>à renseigner</b></div><div class="num"><span>Sécurité du campus</span><b>à renseigner</b></div><p class="small muted">Vérifiez ces numéros avec l\'établissement avant la mise en service.</p>'+close}
+ else if(m==='notifs'){var l=u?myNotifs(u):[];b='<h3>Notifications</h3>'+(l.slice(0,30).map(function(n){return '<div class="num"><span class="small">'+(n.read?'':'<b>• </b>')+esc(n.text)+'</span><span class="muted small">'+hhmm(n.t)+'</span></div>'}).join('')||'<p class="muted">Rien pour le moment.</p>')+close}
+ else if(m==='charte'){b='<h3>Charte d\'utilisation</h3><div class="stack small"><p>1. Respectez chaque étudiant, enseignant et chauffeur. Pas d\'insultes, de harcèlement ni de discrimination.</p><p>2. Ne publiez que des informations vraies et utiles au campus.</p><p>3. Les annonces officielles viennent des délégués portant le badge « Délégué officiel ».</p><p>4. Les signalements abusifs (fausse alerte, fausse perturbation) entraînent une suspension.</p><p>5. Un compte est personnel : ne partagez pas votre mot de passe.</p><p>6. Les délégués et l\'administration peuvent retirer un contenu qui enfreint cette charte.</p></div>'+close}
+ else if(m==='privacy'){b='<h3>Confidentialité</h3><div class="stack small"><p>UniNiger collecte votre nom, numéro de carte, téléphone, filière et année pour vérifier que vous êtes étudiant et vous envoyer les alertes utiles.</p><p>Ces données sont visibles uniquement des délégués et de l\'administration de votre établissement, le numéro de téléphone étant partiellement masqué. Elles ne sont ni vendues ni partagées avec des tiers.</p><p>Les mots de passe sont stockés sous forme chiffrée, et les échanges avec le serveur sont chiffrés dans la version réelle.</p><p>Vous pouvez demander la suppression de votre compte à tout moment.</p><p class="muted">Dans cette démonstration, rien ne quitte votre navigateur.</p></div>'+close}
+ else if(m==='faq'){b='<h3>Questions fréquentes</h3><div class="stack small"><p><b>Comment mon inscription est-elle vérifiée ?</b><br>Par un code SMS sur votre téléphone, puis par la validation d\'un délégué de votre classe ou un code d\'activation de classe.</p><p><b>Comment le bus est-il suivi ?</b><br>Le chauffeur signale son arrivée à chaque arrêt. L\'application calcule ensuite l\'heure estimée aux arrêts suivants.</p><p><b>Puis-je être prévenu pour mon arrêt ?</b><br>Oui, activez la cloche de l\'arrêt dans l\'onglet Bus.</p><p><b>Qui publie les annonces ?</b><br>Les délégués officiels et l\'administration.</p><p><b>Que faire sans connexion ?</b><br>Les horaires théoriques restent visibles et un SMS de secours est prévu.</p></div>'+close}
+ else if(m==='tour'){var T=[['Bienvenue sur UniNiger','Votre campus dans la poche : bus, planning, annonces, groupes et sécurité.'],['Suivez votre bus','Dans l\'onglet Bus, activez la cloche sur votre arrêt pour être prévenu.'],['Restez informé','Les annonces critiques restent épinglées en haut de l\'accueil. Le bouton SOS est toujours en haut à droite.']];var t=T[ui.tour]||T[0];b='<h3>'+t[0]+'</h3><p>'+t[1]+'</p><div class="muted small">Étape '+(ui.tour+1)+' sur '+T.length+'</div>'+(ui.tour<T.length-1?'<button class="btn full" data-a="tournext">Suivant</button>':'<button class="btn gold full" data-a="closem">C\'est parti</button>')}
+ else if(m==='req'){b='<h3>Demander l\'ouverture de votre établissement</h3><form data-form="req" class="stack"><div><label for="rn">Nom de l\'établissement</label><input id="rn" name="name" required></div><div><label for="rc">Ville</label><input id="rc" name="city" required></div><div><label for="rt">Contact (téléphone)</label><input id="rt" name="contact" required></div><button class="btn gold" type="submit">Envoyer la demande</button></form>'+close}
+ else if(m==='code'){b='<h3>Code d\'activation de classe</h3><form data-form="usecode" class="stack"><div><label for="uc">Code</label><input id="uc" name="cc" required autocapitalize="characters"></div><button class="btn gold" type="submit">Activer mon compte</button></form>'+close}
+ else if(m==='problem'){b='<h3>Signaler un problème</h3><form data-form="problem" class="stack"><div><label for="pt">Type</label><select id="pt" name="type"><option>Panne du bus</option><option>Retard important</option><option>Route bloquée</option><option>Autre</option></select></div><div><label for="pm">Précision (facultatif)</label><input id="pm" name="msg"></div><button class="btn red" type="submit">Prévenir les étudiants</button></form>'+close}
+ else if(m==='reset'){b='<h3>Mot de passe oublié</h3><p class="small">Dans la version réelle, un code SMS est envoyé à votre téléphone pour choisir un nouveau mot de passe. Cette démonstration n\'envoie pas de SMS : utilisez un compte de démonstration, mot de passe demo123.</p>'+close}
+ return '<div class="ovl" data-a="ovl"><div class="mod" role="dialog" aria-modal="true">'+b+'</div></div>';
+}
+
+/* ---------- rendu ---------- */
+function render(){
+ var u=cur(),h;
+ if(!u){h=ui.screen==='info'?viewInfo():ui.screen==='form'?viewForm():ui.screen==='login'?viewLogin():viewGrid()}
+ else{h=viewApp(u)}
+ var y=window.scrollY;
+ $('#root').innerHTML=h+modals(u);
+ window.scrollTo(0,y);
+}
+function go(s){ui.screen=s;ui.step=1;ui.modal=null;window.scrollTo(0,0);render()}
+
+/* ---------- actions ---------- */
+function login(a){S.session=a.id;save();ui.tab=defTab(a);ui.modal=null;if(a.role==='student'&&!a.toured){a.toured=true;ui.tour=0;ui.modal='tour';save()}render();window.scrollTo(0,0)}
+function arrive(lid,idx){
+ var L=S.lines.find(function(l){return l.id===lid});if(!L)return;
+ var t=now(),times=(L.state&&L.state.times)||{};times[idx]=t;
+ L.state={idx:idx,at:t,times:times};
+ log('Ligne '+lid+' : bus à "'+L.stops[idx]+'"');
+ S.accounts.forEach(function(a){
+  if(a.role!=='student'||a.status!=='valid')return;
+  var s=a.subs||[];
+  if(s.indexOf(lid+':'+idx)>-1)notify(a.phone,'Le bus de la ligne '+lid+' est à '+L.stops[idx]+'.');
+  if(idx+1<L.stops.length&&s.indexOf(lid+':'+(idx+1))>-1)notify(a.phone,'Le bus approche de '+L.stops[idx+1]+' ('+fmtEta(eta(L,idx+1))+').');
+ });
+ save();toast('Arrivée signalée : '+L.stops[idx]);render();
+}
+var A={
+ pick:function(d){ui.etab=d.id;go('info')},
+ gologin:function(){go('login')},gogrid:function(){go('grid')},goform:function(){go('form')},goinfo:function(){go('info')},
+ tab:function(d){ui.tab=d.t;ui.modal=null;render();window.scrollTo(0,0)},
+ modal:function(d){ui.modal=d.m;if(d.m==='notifs'){var u=cur();if(u){S.notifs.forEach(function(n){if(n.to===u.phone)n.read=true});save()}var s=ui.modal;render();return}render()},
+ closem:function(){ui.modal=null;render()},
+ ovl:function(d,el,e){if(e.target===el){ui.modal=null;render()}},
+ tournext:function(){ui.tour++;render()},
+ sub:function(d){var u=cur(),s=u.subs=u.subs||[],i=s.indexOf(d.k);if(i>-1){s.splice(i,1);toast('Alerte désactivée')}else{s.push(d.k);toast('Alerte activée pour cet arrêt')}save();render()},
+ arrive:function(d){arrive(d.l,Number(d.i))},
+ endtrip:function(d){var L=S.lines.find(function(l){return l.id===d.l});L.state=null;log('Ligne '+d.l+' : trajet terminé');save();render()},
+ cleardis:function(d){var L=S.lines.find(function(l){return l.id===d.id});L.dis=null;log('Ligne '+d.id+' : circulation rétablie');save();toast('Circulation rétablie');render()},
+ cal:function(d){ui.cal=d.v;render()},mo:function(d){ui.mo+=Number(d.d);render()},day:function(d){ui.day=d.d;render()},
+ gomonth:function(d){ui.mo=Number(d.m)-new Date().getMonth();ui.cal='month';render()},
+ comm:function(d){ui.comm=d.v;render()},
+ join:function(d){var u=cur(),g=S.groups.find(function(x){return x.id===d.id}),i=g.members.indexOf(u.phone);if(i>-1)g.members.splice(i,1);else g.members.push(u.phone);save();render()},
+ resolve:function(d){S.lost.find(function(x){return x.id===d.id}).done=true;save();render()},
+ valid:function(d){var a=S.accounts.find(function(x){return x.id===d.id});a.status='valid';notify(a.phone,'Votre inscription est validée. Bienvenue sur UniNiger.');log('Inscription validée : '+a.name);save();toast('Inscription validée');render()},
+ reject:function(d){var a=S.accounts.find(function(x){return x.id===d.id});a.status='rejected';log('Inscription refusée : '+a.name);save();toast('Inscription refusée');render()},
+ delann:function(d){S.ann=S.ann.filter(function(x){return x.id!==d.id});save();render()},
+ askdel:function(d){ui.confirm=d.id;render()},noconf:function(){ui.confirm=null;render()},
+ delacc:function(d){var a=S.accounts.find(function(x){return x.id===d.id});S.accounts=S.accounts.filter(function(x){return x.id!==d.id});ui.confirm=null;log('Compte retiré : '+a.name);save();render()},
+ demo:function(d){var a=S.accounts.find(function(x){return x.phone===d.p});if(a)login(a)},
+ logout:function(){S.session=null;save();ui.screen='grid';ui.modal=null;render()},
+ sossend:function(){var u=cur();S.accounts.forEach(function(a){if(a.role==='delegate'||a.role==='admin')notify(a.phone,'ALERTE SOS de '+u.name+' ('+u.phone+')')});log('SOS envoyé par '+u.name);save();ui.modal=null;toast('Alerte SOS enregistrée (démonstration)');render()},
+ resend:function(){ui.otp=String(Math.floor(100000+Math.random()*900000));render();toast('Nouveau code généré')},
+ reset:function(){S=seed();save();ui.screen='grid';ui.modal=null;toast('Données de démonstration réinitialisées');render()}
+};
+document.addEventListener('click',function(e){
+ var el=e.target.closest('[data-a]');if(!el)return;
+ var fn=A[el.dataset.a];if(fn)fn(el.dataset,el,e);
+});
+var F={
+ signup:function(f){
+  var phone=f.phone.replace(/\D/g,''),card=f.card.trim().toUpperCase();
+  if(!f.ok)return toast('Acceptez la charte pour continuer');
+  if(phone.length!==8)return toast('Le téléphone doit avoir 8 chiffres');
+  if(f.pass.length<6)return toast('Mot de passe trop court');
+  if(S.accounts.some(function(a){return a.phone===phone}))return toast('Ce téléphone a déjà un compte. Connectez-vous.');
+  if(S.accounts.some(function(a){return a.card&&a.card===card}))return toast('Ce numéro de carte est déjà inscrit');
+  ui.signup={name:(f.prenom.trim()+' '+f.nom.trim()),card:card,phone:phone,filiere:f.filiere.trim(),annee:f.annee,pass:hash(f.pass)};
+  ui.otp=String(Math.floor(100000+Math.random()*900000));ui.step=2;render();window.scrollTo(0,0);
+ },
+ otp:function(f){
+  if(f.otp.trim()!==ui.otp)return toast('Code incorrect');
+  var s=ui.signup,cc=(f.cc||'').trim().toUpperCase(),code=S.codes.find(function(c){return c.code===cc}),st='pending';
+  if(cc&&!code)return toast('Code de classe inconnu');
+  if(code){st='valid';code.uses++}
+  var a={id:uid(),role:'student',name:s.name,card:s.card,phone:s.phone,pass:s.pass,status:st,filiere:s.filiere,annee:s.annee,subs:[],toured:false};
+  S.accounts.push(a);log('Nouvelle inscription : '+a.name+(st==='valid'?' (code de classe)':' (à valider)'));
+  S.accounts.forEach(function(x){if(x.role==='delegate'&&st==='pending')notify(x.phone,'Nouvelle inscription à valider : '+a.name)});
+  ui.signup=null;ui.otp=null;login(a);
+  toast(st==='valid'?'Compte validé. Bienvenue !':'Inscription envoyée. Un délégué doit la valider.');
+ },
+ login:function(f){
+  var p=f.phone.replace(/\D/g,''),a=S.accounts.find(function(x){return x.phone===p&&x.pass===hash(f.pass)});
+  if(!a)return toast('Téléphone ou mot de passe incorrect');
+  if(a.status==='rejected')return toast('Votre inscription a été refusée. Contactez votre délégué.');
+  login(a);
+ },
+ ann:function(f){
+  var u=cur(),lv=Number(f.level);
+  S.ann.unshift({id:uid(),level:lv,scope:f.scope,title:f.title.trim(),body:f.body.trim(),author:u.name,badge:u.role==='delegate',t:now()});
+  if(f.date)S.events.push({id:uid(),date:f.date,time:f.time||'08:00',title:f.title.trim(),place:'Voir annonce'});
+  if(lv===3)S.accounts.forEach(function(a){if(a.role==='student'&&a.status==='valid')notify(a.phone,'ALERTE : '+f.title.trim())});
+  log('Annonce publiée : '+f.title.trim());save();toast('Annonce publiée');render();
+ },
+ code:function(f){
+  var base=f.classe.trim().toUpperCase().replace(/[^A-Z0-9]+/g,'-').slice(0,14);
+  S.codes.push({code:base+'-'+Math.floor(1000+Math.random()*9000),classe:f.classe.trim(),uses:0});save();toast('Code créé');render();
+ },
+ group:function(f){var u=cur();S.groups.push({id:uid(),name:f.name.trim(),desc:f.desc.trim(),members:[u.phone]});save();toast('Groupe créé');render()},
+ lost:function(f){var u=cur();S.lost.push({id:uid(),kind:f.kind,text:f.text.trim(),place:f.place.trim(),by:u.name,t:now(),done:false});save();toast('Objet publié');render()},
+ driver:function(f){
+  var p=f.phone.replace(/\D/g,'');if(p.length!==8)return toast('Le téléphone doit avoir 8 chiffres');
+  if(S.accounts.some(function(a){return a.phone===p}))return toast('Ce téléphone est déjà utilisé');
+  S.accounts.push({id:uid(),role:'driver',name:f.name.trim(),card:'',phone:p,pass:hash(f.pass),status:'valid',line:f.line,subs:[],toured:true});log('Compte chauffeur créé : '+f.name.trim());save();toast('Compte chauffeur créé');render();
+ },
+ req:function(f){S.reqs.push({name:f.name.trim(),city:f.city.trim(),contact:f.contact.trim()});log('Demande d\'ouverture : '+f.name.trim());save();ui.modal=null;toast('Demande enregistrée. Merci !');render()},
+ usecode:function(f){
+  var u=cur(),cc=f.cc.trim().toUpperCase(),c=S.codes.find(function(x){return x.code===cc});
+  if(!c)return toast('Code de classe inconnu');
+  c.uses++;u.status='valid';ui.modal=null;save();toast('Compte validé');render();
+ },
+ problem:function(f){
+  var u=cur(),L=S.lines.find(function(l){return l.id===u.line}),txt=f.type+(f.msg?' : '+f.msg.trim():'');
+  L.dis={text:txt,t:now()};
+  S.ann.unshift({id:uid(),level:3,scope:'private',title:'Ligne '+L.id+' : '+f.type,body:txt+'. Signalé par le chauffeur.',author:u.name,badge:false,t:now()});
+  S.accounts.forEach(function(a){if(a.role==='student'&&a.status==='valid')notify(a.phone,'Ligne '+L.id+' perturbée : '+txt)});
+  log('Perturbation ligne '+L.id+' : '+txt);save();ui.modal=null;toast('Les étudiants sont prévenus');render();
+ }
+};
+document.addEventListener('submit',function(e){
+ var f=e.target.closest('form[data-form]');if(!f)return;
+ e.preventDefault();
+ var d={};new FormData(f).forEach(function(v,k){d[k]=typeof v==='string'?v:''});
+ var chk=f.querySelector('input[type=checkbox]');if(chk)d[chk.name]=chk.checked;
+ var fn=F[f.dataset.form];if(fn)fn(d);
+});
+window.addEventListener('storage',function(e){if(e.key===KEY){load();render()}});
+window.addEventListener('online',render);window.addEventListener('offline',render);
+setInterval(function(){var a=document.activeElement;if(ui.modal)return;if(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))return;if(cur())render()},30000);
+if(cur()&&!ui.tab)ui.tab=defTab(cur());
+render();
+})();
+</script>

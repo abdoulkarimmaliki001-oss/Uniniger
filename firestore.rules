@@ -1,0 +1,69 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function me() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function hasProfile() { return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)); }
+    function isValid() { return hasProfile() && me().status == 'valid'; }
+    function role() { return me().role; }
+    function isDelegate() { return isValid() && (role() == 'delegate' || role() == 'admin'); }
+    function isAdmin() { return isValid() && role() == 'admin'; }
+    function isDriver() { return isValid() && role() == 'driver'; }
+    function sameEtab(e) { return hasProfile() && me().etab == e; }
+
+    // Profils : un étudiant crée son propre profil en attente, sans pouvoir se donner un rôle ni se valider.
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || (isDelegate() && sameEtab(resource.data.etab)));
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.role == 'student'
+        && request.resource.data.status == 'pending';
+      // L'étudiant peut modifier ses arrêts favoris seulement.
+      allow update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['subs','toured'])
+        // Un délégué valide ou refuse les étudiants de son établissement.
+        || isDelegate() && sameEtab(resource.data.etab)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+      allow delete: if isAdmin();
+    }
+
+    // Annonces : nationales visibles partout, privées pour l'établissement seulement.
+    match /announcements/{id} {
+      allow read: if isValid() && (resource.data.scope == 'national' || sameEtab(resource.data.etab));
+      allow create: if isDelegate() && request.resource.data.etab == me().etab;
+      allow update, delete: if isDelegate() && sameEtab(resource.data.etab);
+    }
+
+    match /events/{id} {
+      allow read: if isValid() && sameEtab(resource.data.etab);
+      allow write: if isDelegate() && sameEtab(request.resource.data.etab);
+    }
+
+    // Lignes de bus : le chauffeur met à jour sa propre ligne uniquement (état et perturbation).
+    match /lines/{id} {
+      allow read: if isValid() && sameEtab(resource.data.etab);
+      allow update: if isDriver() && me().line == id
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['state','dis']);
+      allow create, delete: if isAdmin();
+    }
+
+    match /groups/{id} {
+      allow read: if isValid() && sameEtab(resource.data.etab);
+      allow create: if isValid() && sameEtab(request.resource.data.etab);
+      allow update, delete: if isDelegate() && sameEtab(resource.data.etab);
+    }
+
+    match /lost/{id} {
+      allow read: if isValid() && sameEtab(resource.data.etab);
+      allow create: if isValid() && sameEtab(request.resource.data.etab);
+      allow update, delete: if isValid() && (resource.data.uid == request.auth.uid || isDelegate());
+    }
+
+    // Codes d'activation de classe : lecture réservée aux délégués.
+    match /classCodes/{id} {
+      allow read, write: if isDelegate() && sameEtab(request.resource.data.etab);
+    }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}
